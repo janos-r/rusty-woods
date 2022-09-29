@@ -16,7 +16,7 @@ fn main() {
 }
 
 #[derive(Component)]
-struct Player;
+struct MovePlayer;
 
 #[derive(Component, Deref, DerefMut)]
 struct AnimationTimer(Timer);
@@ -32,7 +32,10 @@ fn setup(
     let texture_handle = asset_server.load("textures/rpg/chars/gabe/gabe-idle-run.png");
     let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1);
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
-    commands.spawn_bundle(Camera2dBundle::default());
+    commands
+        .spawn_bundle(Camera2dBundle::default())
+        .insert(MovePlayer)
+        .insert(Velocity::default());
 
     // Player
     commands
@@ -42,10 +45,7 @@ fn setup(
             ..default()
         })
         .insert(AnimationTimer(Timer::from_seconds(0.1, true)))
-        .insert(Player)
-        // .with_children(|parent| {
-        //     parent.spawn_bundle(Camera2dBundle::default());
-        // })
+        .insert(MovePlayer)
         .insert(Velocity::default());
 
     commands.spawn_bundle(SpriteBundle {
@@ -59,7 +59,10 @@ fn setup(
     });
 }
 
-fn move_player(keyboard_input: Res<Input<KeyCode>>, mut query: Query<&mut Velocity, With<Player>>) {
+fn move_player(
+    keyboard_input: Res<Input<KeyCode>>,
+    mut query: Query<&mut Velocity, With<MovePlayer>>,
+) {
     for mut velocity in &mut query {
         const SPEED: f32 = 5.;
 
