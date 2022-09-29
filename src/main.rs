@@ -1,21 +1,27 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, render::texture::ImageSettings};
 
 fn main() {
-    App::build()
+    App::new()
         .insert_resource(WindowDescriptor {
             title: "Bevy - My testing app ^_^".into(),
-            ..Default::default()
+            ..default()
         })
+        .insert_resource(ImageSettings::default_nearest()) // prevents blurry sprites
         .add_plugins(DefaultPlugins)
-        .add_startup_system(setup.system())
-        .add_system(move_player.system())
-        .add_system(update_transform_from_velocity.system().label("move"))
-        .add_system(animate_sprite_system_velocity.system().after("move"))
+        .add_startup_system(setup)
+        .add_system(move_player)
+        .add_system(update_transform_from_velocity)
+        .add_system(animate_sprite_system_velocity)
         .run();
 }
 
+#[derive(Component)]
 struct Player;
-#[derive(Default, PartialEq)]
+
+#[derive(Component, Deref, DerefMut)]
+struct AnimationTimer(Timer);
+
+#[derive(Component, Default)]
 struct Velocity(Vec3);
 
 fn setup(
@@ -26,20 +32,35 @@ fn setup(
     let texture_handle = asset_server.load("textures/rpg/chars/gabe/gabe-idle-run.png");
     let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1);
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+    commands.spawn_bundle(Camera2dBundle::default());
+
+    // Player
     commands
         .spawn_bundle(SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
             transform: Transform::from_scale(Vec3::splat(6.0)),
-            ..Default::default()
+            ..default()
         })
-        .insert(Timer::from_seconds(0.1, true))
+        .insert(AnimationTimer(Timer::from_seconds(0.1, true)))
         .insert(Player)
+        // .with_children(|parent| {
+        //     parent.spawn_bundle(Camera2dBundle::default());
+        // })
         .insert(Velocity::default());
+
+    commands.spawn_bundle(SpriteBundle {
+        sprite: Sprite {
+            color: Color::rgb(0.7, 0.7, 0.7),
+            custom_size: Some(Vec2::new(200.0, 50.0)),
+            ..default()
+        },
+        transform: Transform::from_translation(Vec3::new(0., -100., 0.)),
+        ..default()
+    });
 }
 
 fn move_player(keyboard_input: Res<Input<KeyCode>>, mut query: Query<&mut Velocity, With<Player>>) {
-    for mut velocity in query.iter_mut() {
+    for mut velocity in &mut query {
         const SPEED: f32 = 5.;
 
         let default = Vec3::default();
@@ -68,7 +89,7 @@ fn move_player(keyboard_input: Res<Input<KeyCode>>, mut query: Query<&mut Veloci
 fn update_transform_from_velocity(
     mut query: Query<(&mut Transform, &Velocity), Changed<Velocity>>,
 ) {
-    for (mut transform, velocity) in query.iter_mut() {
+    for (mut transform, velocity) in &mut query {
         transform.translation += velocity.0;
     }
 }
@@ -78,7 +99,7 @@ fn animate_sprite_system_velocity(
     texture_atlases: Res<Assets<TextureAtlas>>,
     mut query: Query<
         (
-            &mut Timer,
+            &mut AnimationTimer,
             &mut TextureAtlasSprite,
             &Handle<TextureAtlas>,
             &Velocity,
@@ -86,13 +107,13 @@ fn animate_sprite_system_velocity(
         Changed<Velocity>,
     >,
 ) {
-    for (mut timer, mut sprite, texture_atlas_handle, velocity) in query.iter_mut() {
+    for (mut timer, mut sprite, texture_atlas_handle, velocity) in &mut query {
         timer.tick(time.delta());
         if velocity.0 == Vec3::default() {
             sprite.index = 0;
         } else if timer.finished() {
             let texture_atlas = texture_atlases.get(texture_atlas_handle).unwrap();
-            sprite.index = ((sprite.index as usize + 1) % texture_atlas.textures.len()) as u32;
+            sprite.index = (sprite.index as usize + 1) % texture_atlas.textures.len();
         }
     }
 }
