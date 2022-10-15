@@ -87,6 +87,70 @@ fn setup(
             ..default()
         })
         .insert(InWorld::W2);
+
+    // Bottom text box
+    commands
+        .spawn_bundle(NodeBundle {
+            style: Style {
+                size: Size::new(Val::Percent(100.0), Val::Px(200.0)),
+                // makes space bellow the box
+                align_items: AlignItems::FlexEnd,
+                justify_content: JustifyContent::Center,
+                ..default()
+            },
+            // transparent container
+            color: Color::rgba(0.65, 0.65, 0.65, 0.).into(),
+            ..default()
+        })
+        .with_children(|parent| {
+            // box size, border thickness and color
+            parent
+                .spawn_bundle(NodeBundle {
+                    style: Style {
+                        size: Size::new(Val::Percent(80.0), Val::Percent(90.0)),
+                        border: UiRect::all(Val::Px(5.0)),
+                        ..default()
+                    },
+                    color: Color::MIDNIGHT_BLUE.into(),
+                    ..default()
+                })
+                .with_children(|parent| {
+                    // text background
+                    parent
+                        .spawn_bundle(NodeBundle {
+                            style: Style {
+                                size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
+                                align_items: AlignItems::FlexEnd,
+                                ..default()
+                            },
+                            color: Color::rgb(0.15, 0.15, 0.15).into(),
+                            ..default()
+                        })
+                        .with_children(|parent| {
+                            // text
+                            parent.spawn_bundle(
+                                TextBundle::from_section(
+                                    // "Text Example",
+                                    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularized in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+                                    TextStyle {
+                                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                        font_size: 25.0,
+                                        color: Color::WHITE,
+                                    },
+                                )
+                                .with_style(Style {
+                                    margin: UiRect::all(Val::Px(10.0)),
+                                    size: Size{
+                                        // `Val::Percent` doesn't work currently for wrapping
+                                        width: Val::Px(1000.),
+                                        ..default()
+                                    },
+                                    ..default()
+                                }),
+                            );
+                        });
+                });
+        });
 }
 
 fn move_player(
@@ -163,11 +227,7 @@ fn animate_sprite_system_velocity(
 fn switch_world(current_world: Res<CurrentWorld>, mut query: Query<(&mut Visibility, &InWorld)>) {
     if current_world.is_changed() {
         for (mut visibility, in_world) in &mut query {
-            visibility.is_visible = if in_world == &current_world.0 {
-                true
-            } else {
-                false
-            }
+            visibility.is_visible = in_world == &current_world.0
         }
     }
 }

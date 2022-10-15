@@ -1,5 +1,6 @@
 TODOs:
 - bottom text box
+    - load text and visibility from global resource
 - collision
 - doors
 - interaction with something in front
