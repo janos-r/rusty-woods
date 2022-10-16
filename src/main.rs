@@ -36,6 +36,12 @@ enum InWorld {
 }
 struct CurrentWorld(InWorld);
 
+// Text box
+#[derive(Component)]
+struct TextBoxContainer;
+#[derive(Component)]
+struct TextBox;
+
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -89,6 +95,7 @@ fn setup(
         .insert(InWorld::W2);
 
     // Bottom text box
+    let text_box_width = 1000.;
     commands
         .spawn_bundle(NodeBundle {
             style: Style {
@@ -102,12 +109,15 @@ fn setup(
             color: Color::rgba(0.65, 0.65, 0.65, 0.).into(),
             ..default()
         })
+        .insert(TextBoxContainer)
         .with_children(|parent| {
             // box size, border thickness and color
             parent
                 .spawn_bundle(NodeBundle {
                     style: Style {
-                        size: Size::new(Val::Percent(80.0), Val::Percent(90.0)),
+                        // because for now, text can't wrap in width by percentage
+                        // size: Size::new(Val::Px(text_box_width), Val::Percent(90.0)),
+                        size: Size::new(Val::Px(text_box_width), Val::Percent(90.0)),
                         border: UiRect::all(Val::Px(5.0)),
                         ..default()
                     },
@@ -128,26 +138,29 @@ fn setup(
                         })
                         .with_children(|parent| {
                             // text
-                            parent.spawn_bundle(
-                                TextBundle::from_section(
-                                    // "Text Example",
-                                    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularized in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-                                    TextStyle {
-                                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                        font_size: 25.0,
-                                        color: Color::WHITE,
-                                    },
-                                )
-                                .with_style(Style {
-                                    margin: UiRect::all(Val::Px(10.0)),
-                                    size: Size{
-                                        // `Val::Percent` doesn't work currently for wrapping
-                                        width: Val::Px(1000.),
+                            parent
+                                .spawn_bundle(
+                                    TextBundle::from_section(
+                                        "Text Example",
+                                        // "Text Example a little longer trying to cross the width. Text Example a little longer trying to cross the width",
+                                        // "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularized in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+                                        TextStyle {
+                                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                            font_size: 30.0,
+                                            color: Color::WHITE,
+                                        },
+                                    )
+                                    .with_style(Style {
+                                        margin: UiRect::all(Val::Px(5.0)),
+                                        size: Size {
+                                            // `Val::Percent` doesn't work currently for wrapping
+                                            width: Val::Px(600.),
+                                            ..default()
+                                        },
                                         ..default()
-                                    },
-                                    ..default()
-                                }),
-                            );
+                                    }),
+                                )
+                                .insert(TextBox);
                         });
                 });
         });
