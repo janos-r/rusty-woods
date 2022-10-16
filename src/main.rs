@@ -116,7 +116,6 @@ fn setup(
                 .spawn_bundle(NodeBundle {
                     style: Style {
                         // because for now, text can't wrap in width by percentage
-                        // size: Size::new(Val::Px(text_box_width), Val::Percent(90.0)),
                         size: Size::new(Val::Px(text_box_width), Val::Percent(90.0)),
                         border: UiRect::all(Val::Px(5.0)),
                         ..default()
@@ -151,12 +150,13 @@ fn setup(
                                         },
                                     )
                                     .with_style(Style {
-                                        margin: UiRect::all(Val::Px(5.0)),
-                                        size: Size {
-                                            // `Val::Percent` doesn't work currently for wrapping
-                                            width: Val::Px(600.),
-                                            ..default()
-                                        },
+                                        margin: UiRect::all(Val::Px(10.0)),
+                                        // For now broken, commented myself on: https://github.com/bevyengine/bevy/issues/5834
+                                        // size: Size {
+                                        //     // `Val::Percent` doesn't work currently for wrapping
+                                        //     width: Val::Px(600.),
+                                        //     ..default()
+                                        // },
                                         ..default()
                                     }),
                                 )
@@ -169,7 +169,10 @@ fn setup(
 fn move_player(
     keyboard_input: Res<Input<KeyCode>>,
     mut query: Query<&mut Velocity, With<MovePlayer>>,
+    // just for testing - to be taken out after proper triggers
     mut current_world: ResMut<CurrentWorld>,
+    mut text_box_visibility: Query<&mut Visibility, With<TextBoxContainer>>,
+    mut text_box: Query<&mut Text, With<TextBox>>,
 ) {
     for mut velocity in &mut query {
         const SPEED: f32 = 5.;
@@ -197,10 +200,17 @@ fn move_player(
 
         if keyboard_input.pressed(KeyCode::Up) {
             velocity.0 += Vec3::new(0., SPEED, 0.);
+
+            // TODO:
+            // create proper trigger for the text box
+            text_box_visibility.single_mut().is_visible = true;
+            text_box.single_mut().sections[0].value =
+                "A totally new text from the trigger ^^".to_owned()
         }
 
         if keyboard_input.pressed(KeyCode::Down) {
             velocity.0 += Vec3::new(0., -SPEED, 0.);
+            text_box_visibility.single_mut().is_visible = false;
         }
     }
 }
