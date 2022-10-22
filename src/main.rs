@@ -1,4 +1,5 @@
 use bevy::{prelude::*, render::texture::ImageSettings};
+use bevy_rapier2d::prelude::*;
 
 fn main() {
     App::new()
@@ -8,7 +9,13 @@ fn main() {
         })
         .insert_resource(ImageSettings::default_nearest()) // prevents blurry sprites
         .insert_resource(CurrentWorld(InWorld::W1Main))
+        .insert_resource(RapierConfiguration {
+            gravity: Vec2::ZERO,
+            ..default()
+        })
         .add_plugins(DefaultPlugins)
+        .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
+        .add_plugin(RapierDebugRenderPlugin::default()) // draws borders around coliders
         .add_startup_system(setup)
         .add_system(move_player)
         .add_system(move_camera)
@@ -49,6 +56,8 @@ struct PlayerBundle {
     animation_timer: AnimationTimer,
     player: Player,
     velocity: Velocity,
+    rigid_body: RigidBody,
+    locked_axes: LockedAxes,
 }
 
 #[derive(Bundle)]
@@ -56,6 +65,7 @@ struct MySpriteBundle {
     in_world: InWorld,
     #[bundle]
     sprite_bundle: SpriteBundle,
+    colider: Collider,
 }
 
 fn setup(
@@ -71,15 +81,24 @@ fn setup(
     commands.spawn_bundle(Camera2dBundle::default());
 
     // Player
-    commands.spawn_bundle(PlayerBundle {
-        animation_timer: AnimationTimer(Timer::from_seconds(0.08, true)),
-        sprite_sheet_bundle: SpriteSheetBundle {
-            texture_atlas: texture_atlas_handle,
-            transform: Transform::from_scale(Vec3::splat(6.0)),
+    commands
+        .spawn_bundle(PlayerBundle {
+            animation_timer: AnimationTimer(Timer::from_seconds(0.08, true)),
+            sprite_sheet_bundle: SpriteSheetBundle {
+                texture_atlas: texture_atlas_handle,
+                transform: Transform::from_scale(Vec3::splat(6.)),
+                ..default()
+            },
+            rigid_body: RigidBody::Dynamic,
+            locked_axes: LockedAxes::ROTATION_LOCKED,
             ..default()
-        },
-        ..default()
-    });
+        })
+        .with_children(|parent| {
+            parent
+                // Position the collider relative to the rigid-body.
+                .spawn_bundle(TransformBundle::from(Transform::from_xyz(0., -40.0, 0.)))
+                .insert(Collider::ball(6.));
+        });
 
     // Sprites
     commands.spawn_bundle(MySpriteBundle {
@@ -93,6 +112,7 @@ fn setup(
             transform: Transform::from_translation(Vec3::new(0., -100., 0.)),
             ..default()
         },
+        colider: Collider::cuboid(100.0, 25.0),
     });
 
     commands.spawn_bundle(MySpriteBundle {
@@ -107,6 +127,7 @@ fn setup(
             visibility: Visibility { is_visible: false },
             ..default()
         },
+        colider: Collider::cuboid(25.0, 100.0),
     });
 
     // Bottom text box
