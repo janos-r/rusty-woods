@@ -1,17 +1,13 @@
 TODOs:
-- bottom text box
-    - load text and visibility from global resource
+- map editor - create and import a map LDtk
+    - LDtk - bevy_ecs_ldtk; https://ldtk.io/
 - collision
-- doors
 - interaction with something in front
+- doors
 - signs
 - save_game
     found a good example at:
     https://github.com/bevyengine/bevy/issues/1442
-- map editor
-    - create and import a map from Tiled or LDtk
-        - Tiled - https://www.mapeditor.org/
-        - LDtk - bevy_ecs_ldtk; https://ldtk.io/
 
 bevy game list
 https://itch.io/search?q=bevy
