@@ -66,6 +66,7 @@ struct MySpriteBundle {
     #[bundle]
     sprite_bundle: SpriteBundle,
     colider: Collider,
+    collision_groups: CollisionGroups,
 }
 
 fn setup(
@@ -113,6 +114,7 @@ fn setup(
             ..default()
         },
         colider: Collider::cuboid(100.0, 25.0),
+        collision_groups: CollisionGroups::default(),
     });
 
     commands.spawn_bundle(MySpriteBundle {
@@ -128,6 +130,7 @@ fn setup(
             ..default()
         },
         colider: Collider::cuboid(25.0, 100.0),
+        collision_groups: CollisionGroups::new(Group::ALL, Group::NONE),
     });
 
     // Bottom text box
@@ -291,10 +294,18 @@ fn animate_sprite_system_velocity(
     }
 }
 
-fn switch_world(current_world: Res<CurrentWorld>, mut query: Query<(&mut Visibility, &InWorld)>) {
+fn switch_world(
+    current_world: Res<CurrentWorld>,
+    mut query: Query<(&mut Visibility, &mut CollisionGroups, &InWorld)>,
+) {
     if current_world.is_changed() {
-        for (mut visibility, in_world) in &mut query {
-            visibility.is_visible = in_world == &current_world.0
+        for (mut visibility, mut collision_groups, in_world) in &mut query {
+            visibility.is_visible = in_world == &current_world.0;
+            collision_groups.filters = if in_world == &current_world.0 {
+                Group::ALL
+            } else {
+                Group::NONE
+            };
         }
     }
 }
