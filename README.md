@@ -1,8 +1,7 @@
 TODOs:
-- map editor - create and import a map LDtk
-    - LDtk - bevy_ecs_ldtk; https://ldtk.io/
-- interaction with something in front
 - doors
+- walls
+- interaction with something in front
 - signs
 - save_game
     found a good example at:

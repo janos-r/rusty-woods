@@ -7,4 +7,5 @@ version = "0.1.0"
 
 [dependencies]
 bevy = {version = "0.8", features = ["dynamic"]}
-bevy_rapier2d = "0.17.0"
+bevy_ecs_ldtk = "0.4.0"
+bevy_rapier2d = "0.18"

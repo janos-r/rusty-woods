@@ -1,4 +1,5 @@
 use bevy::{prelude::*, render::texture::ImageSettings};
+use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 fn main() {
@@ -8,20 +9,23 @@ fn main() {
             ..default()
         })
         .insert_resource(ImageSettings::default_nearest()) // prevents blurry sprites
-        .insert_resource(CurrentWorld(InWorld::W1Main))
         .insert_resource(RapierConfiguration {
             gravity: Vec2::ZERO,
             ..default()
         })
+        .insert_resource(LevelSelection::Index(0))
         .add_plugins(DefaultPlugins)
+        .add_plugin(LdtkPlugin)
+        .register_ldtk_entity::<PlayerBundle>("Entity1")
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
-        .add_plugin(RapierDebugRenderPlugin::default()) // draws borders around coliders
+        .add_plugin(RapierDebugRenderPlugin::default()) // draws borders around colliders
         .add_startup_system(setup)
+        .add_system(spawn_player)
         .add_system(move_player)
         .add_system(move_camera)
         .add_system(update_transform_from_velocity)
         .add_system(animate_sprite_system_velocity)
-        .add_system(switch_world)
+        .add_system(switch_level)
         .run();
 }
 
@@ -34,22 +38,21 @@ struct AnimationTimer(Timer);
 #[derive(Component, Default)]
 struct Velocity(Vec3);
 
-// For switching between visible worlds
-#[derive(Component, PartialEq)]
-enum InWorld {
-    W1Main,
-    W2,
-}
-struct CurrentWorld(InWorld);
-
 // Text box
 #[derive(Component)]
 struct TextBoxContainer;
 #[derive(Component)]
 struct TextBox;
 
+#[derive(Component)]
+struct Destination {
+    level: usize,
+    x: f32,
+    y: f32,
+}
+
 // Local Bundles
-#[derive(Bundle, Default)]
+#[derive(Bundle, Default, LdtkEntity)]
 struct PlayerBundle {
     #[bundle]
     sprite_sheet_bundle: SpriteSheetBundle,
@@ -58,67 +61,75 @@ struct PlayerBundle {
     velocity: Velocity,
     rigid_body: RigidBody,
     locked_axes: LockedAxes,
+    #[worldly]
+    worldly: Worldly,
 }
 
-#[derive(Bundle)]
-struct MySpriteBundle {
-    in_world: InWorld,
-    #[bundle]
-    sprite_bundle: SpriteBundle,
-    colider: Collider,
-    collision_groups: CollisionGroups,
-}
-
-fn setup(
+fn spawn_player(
     mut commands: Commands,
+    mut query_player: Query<Entity, Added<Player>>,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
-    let texture_handle = asset_server.load("textures/rpg/chars/gabe/gabe-idle-run.png");
-    let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1);
-    let texture_atlas_handle = texture_atlases.add(texture_atlas);
+    if let Ok(player) = query_player.get_single_mut() {
+        let texture_handle = asset_server.load("textures/rpg/chars/gabe/gabe-idle-run.png");
+        let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1);
+        let texture_atlas_handle = texture_atlases.add(texture_atlas);
+        commands
+            .entity(player)
+            .insert(AnimationTimer(Timer::from_seconds(0.08, true)))
+            .insert(texture_atlas_handle)
+            .insert(RigidBody::Dynamic)
+            .insert(LockedAxes::ROTATION_LOCKED)
+            .with_children(|parent| {
+                parent
+                    // Position the collider relative to the rigid-body.
+                    .spawn_bundle(TransformBundle::from(Transform::from_xyz(0., -8.0, 0.)))
+                    .insert(Collider::ball(8.));
+            });
+    }
+}
 
+#[derive(Bundle, LdtkEntity)]
+struct MySpriteBundle {
+    #[sprite_bundle]
+    #[bundle]
+    sprite_bundle: SpriteBundle,
+    collider: Collider,
+}
+
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Camera
     commands.spawn_bundle(Camera2dBundle::default());
 
-    // Player
-    commands
-        .spawn_bundle(PlayerBundle {
-            animation_timer: AnimationTimer(Timer::from_seconds(0.08, true)),
-            sprite_sheet_bundle: SpriteSheetBundle {
-                texture_atlas: texture_atlas_handle,
-                transform: Transform::from_scale(Vec3::splat(6.)),
-                ..default()
-            },
-            rigid_body: RigidBody::Dynamic,
-            locked_axes: LockedAxes::ROTATION_LOCKED,
-            ..default()
-        })
-        .with_children(|parent| {
-            parent
-                // Position the collider relative to the rigid-body.
-                .spawn_bundle(TransformBundle::from(Transform::from_xyz(0., -40.0, 0.)))
-                .insert(Collider::ball(6.));
-        });
-
-    // Sprites
-    commands.spawn_bundle(MySpriteBundle {
-        in_world: InWorld::W1Main,
-        sprite_bundle: SpriteBundle {
-            sprite: Sprite {
-                color: Color::rgb(0.7, 0.7, 0.7),
-                custom_size: Some(Vec2::new(200.0, 50.0)),
-                ..default()
-            },
-            transform: Transform::from_translation(Vec3::new(0., -100., 0.)),
-            ..default()
-        },
-        colider: Collider::cuboid(100.0, 25.0),
-        collision_groups: CollisionGroups::default(),
+    // Ldtk world
+    commands.spawn_bundle(LdtkWorldBundle {
+        ldtk_handle: asset_server.load("LDtk/world1.ldtk"),
+        ..Default::default()
     });
 
+    // Sprites
+    commands
+        .spawn_bundle(MySpriteBundle {
+            sprite_bundle: SpriteBundle {
+                sprite: Sprite {
+                    color: Color::rgb(0.7, 0.7, 0.7),
+                    custom_size: Some(Vec2::new(200.0, 50.0)),
+                    ..default()
+                },
+                transform: Transform::from_translation(Vec3::new(0., -100., 0.)),
+                ..default()
+            },
+            collider: Collider::cuboid(100.0, 25.0),
+        })
+        .insert(ActiveEvents::COLLISION_EVENTS)
+        .insert(Destination {
+            level: 1,
+            x: 0.,
+            y: 100.,
+        });
+
     commands.spawn_bundle(MySpriteBundle {
-        in_world: InWorld::W2,
         sprite_bundle: SpriteBundle {
             sprite: Sprite {
                 color: Color::rgb(0.7, 0.7, 0.1),
@@ -126,11 +137,9 @@ fn setup(
                 ..default()
             },
             transform: Transform::from_translation(Vec3::new(200., 0., 0.)),
-            visibility: Visibility { is_visible: false },
             ..default()
         },
-        colider: Collider::cuboid(25.0, 100.0),
-        collision_groups: CollisionGroups::new(Group::ALL, Group::NONE),
+        collider: Collider::cuboid(25.0, 100.0),
     });
 
     // Bottom text box
@@ -209,47 +218,39 @@ fn move_player(
     keyboard_input: Res<Input<KeyCode>>,
     mut query: Query<&mut Velocity, With<Player>>,
     // just for testing - to be taken out after proper triggers
-    mut current_world: ResMut<CurrentWorld>,
     mut text_box_visibility: Query<&mut Visibility, With<TextBoxContainer>>,
     mut text_box: Query<&mut Text, With<TextBox>>,
 ) {
-    let mut player_velocity = query.single_mut();
-    const SPEED: f32 = 5.;
+    if let Ok(mut player_velocity) = query.get_single_mut() {
+        const SPEED: f32 = 3.;
 
-    let default = Vec3::default();
-    if player_velocity.0 != default {
-        player_velocity.0 = default;
-    }
+        let default = Vec3::default();
+        if player_velocity.0 != default {
+            player_velocity.0 = default;
+        }
 
-    if keyboard_input.pressed(KeyCode::Left) {
-        player_velocity.0 += Vec3::new(-SPEED, 0., 0.);
+        if keyboard_input.pressed(KeyCode::Left) {
+            player_velocity.0 += Vec3::new(-SPEED, 0., 0.);
+        }
 
-        // TODO:
-        // after collision detection, create doors to change the current world
-        // enter W1
-        current_world.0 = InWorld::W1Main;
-    }
+        if keyboard_input.pressed(KeyCode::Right) {
+            player_velocity.0 += Vec3::new(SPEED, 0., 0.);
+        }
 
-    if keyboard_input.pressed(KeyCode::Right) {
-        player_velocity.0 += Vec3::new(SPEED, 0., 0.);
+        if keyboard_input.pressed(KeyCode::Up) {
+            player_velocity.0 += Vec3::new(0., SPEED, 0.);
 
-        // enter W2
-        current_world.0 = InWorld::W2;
-    }
+            // TODO:
+            // create proper trigger for the text box
+            text_box_visibility.single_mut().is_visible = true;
+            text_box.single_mut().sections[0].value =
+                "A totally new text from the trigger ^^".to_owned()
+        }
 
-    if keyboard_input.pressed(KeyCode::Up) {
-        player_velocity.0 += Vec3::new(0., SPEED, 0.);
-
-        // TODO:
-        // create proper trigger for the text box
-        text_box_visibility.single_mut().is_visible = true;
-        text_box.single_mut().sections[0].value =
-            "A totally new text from the trigger ^^".to_owned()
-    }
-
-    if keyboard_input.pressed(KeyCode::Down) {
-        player_velocity.0 += Vec3::new(0., -SPEED, 0.);
-        text_box_visibility.single_mut().is_visible = false;
+        if keyboard_input.pressed(KeyCode::Down) {
+            player_velocity.0 += Vec3::new(0., -SPEED, 0.);
+            text_box_visibility.single_mut().is_visible = false;
+        }
     }
 }
 
@@ -257,9 +258,10 @@ fn move_camera(
     player_query: Query<&Transform, With<Player>>,
     mut camera_query: Query<(&mut Transform, With<Camera>), Without<Player>>,
 ) {
-    let player_transform = player_query.single();
-    let mut camera_transform = camera_query.single_mut().0;
-    camera_transform.translation = player_transform.translation;
+    if let Ok(player_transform) = player_query.get_single() {
+        let mut camera_transform = camera_query.single_mut().0;
+        camera_transform.translation = player_transform.translation;
+    }
 }
 
 fn update_transform_from_velocity(
@@ -294,18 +296,25 @@ fn animate_sprite_system_velocity(
     }
 }
 
-fn switch_world(
-    current_world: Res<CurrentWorld>,
-    mut query: Query<(&mut Visibility, &mut CollisionGroups, &InWorld)>,
+fn switch_level(
+    mut collision_events: EventReader<CollisionEvent>,
+    mut player_query: Query<&mut Transform, With<Player>>,
+    mut level: ResMut<LevelSelection>,
+    destination_query: Query<&Destination>,
 ) {
-    if current_world.is_changed() {
-        for (mut visibility, mut collision_groups, in_world) in &mut query {
-            visibility.is_visible = in_world == &current_world.0;
-            collision_groups.filters = if in_world == &current_world.0 {
-                Group::ALL
-            } else {
-                Group::NONE
-            };
+    for collision_event in collision_events.iter() {
+        if let CollisionEvent::Started(e1, e2, _) = collision_event {
+            // lets not hope that the door will always be e1 - lets try both and also stop if it was first
+            for entity in [e1, e2] {
+                if let Ok(destination) = destination_query.get(*entity) {
+                    if let Ok(mut player_transform) = player_query.get_single_mut() {
+                        player_transform.translation.x = destination.x;
+                        player_transform.translation.y = destination.y;
+                        *level = LevelSelection::Index(destination.level);
+                    }
+                    break;
+                };
+            }
         }
     }
 }
