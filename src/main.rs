@@ -81,9 +81,9 @@ fn spawn_player(
             .insert(texture_atlas_handle)
             .insert(RigidBody::Dynamic)
             .insert(LockedAxes::ROTATION_LOCKED)
+            // Position the collider relative to the rigid-body.
             .with_children(|parent| {
                 parent
-                    // Position the collider relative to the rigid-body.
                     .spawn_bundle(TransformBundle::from(Transform::from_xyz(0., -8.0, 0.)))
                     .insert(Collider::ball(8.));
             });
@@ -143,83 +143,90 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     });
 
     // Bottom text box
-    let text_box_width = 1000.;
-    commands
-        .spawn_bundle(NodeBundle {
+    commands.spawn_bundle(NodeBundle {
+        style: Style {
+            size: Size::new(Val::Percent(100.0), Val::Px(200.0)),
+            // makes space bellow the box
+            align_items: AlignItems::FlexEnd,
+            justify_content: JustifyContent::Center,
+            ..default()
+        },
+        // transparent container
+        color: Color::rgba(0.65, 0.65, 0.65, 0.).into(),
+        ..default()
+    })
+    .insert(TextBoxContainer)
+    .with_children(|parent| {
+        // box size, border thickness and color
+        parent.spawn_bundle(NodeBundle {
             style: Style {
-                size: Size::new(Val::Percent(100.0), Val::Px(200.0)),
-                // makes space bellow the box
-                align_items: AlignItems::FlexEnd,
-                justify_content: JustifyContent::Center,
+                size: Size::new(Val::Percent(80.), Val::Percent(80.0)),
+                border: UiRect::all(Val::Px(6.0)),
                 ..default()
             },
-            // transparent container
-            color: Color::rgba(0.65, 0.65, 0.65, 0.).into(),
+            color: Color::MIDNIGHT_BLUE.into(),
             ..default()
         })
-        .insert(TextBoxContainer)
         .with_children(|parent| {
-            // box size, border thickness and color
-            parent
-                .spawn_bundle(NodeBundle {
-                    style: Style {
-                        // because for now, text can't wrap in width by percentage
-                        size: Size::new(Val::Px(text_box_width), Val::Percent(90.0)),
-                        border: UiRect::all(Val::Px(5.0)),
-                        ..default()
-                    },
-                    color: Color::MIDNIGHT_BLUE.into(),
+            // text background
+            let font_handle = asset_server.load("fonts/FiraSans-Bold.ttf");
+            parent.spawn_bundle(NodeBundle {
+                style: Style {
+                    size: Size::new(Val::Percent(100.0), Val::Percent(100.)),
+                    padding: UiRect::all(Val::Px(6.)),
+                    // horizontal alignment: left (start = default), center, right
+                    // justify_content: JustifyContent::FlexStart,
+                    flex_wrap: FlexWrap::WrapReverse,
+                    // vertical alignment
+                    align_content: AlignContent::FlexEnd,
                     ..default()
-                })
-                .with_children(|parent| {
-                    // text background
-                    parent
-                        .spawn_bundle(NodeBundle {
-                            style: Style {
-                                size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
-                                align_items: AlignItems::FlexEnd,
-                                ..default()
-                            },
-                            color: Color::rgb(0.15, 0.15, 0.15).into(),
-                            ..default()
-                        })
-                        .with_children(|parent| {
-                            // text
-                            parent
-                                .spawn_bundle(
-                                    TextBundle::from_section(
-                                        "Text Example",
-                                        // "Text Example a little longer trying to cross the width. Text Example a little longer trying to cross the width",
-                                        // "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularized in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-                                        TextStyle {
-                                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                            font_size: 30.0,
-                                            color: Color::WHITE,
-                                        },
-                                    )
-                                    .with_style(Style {
-                                        margin: UiRect::all(Val::Px(10.0)),
-                                        // For now broken, commented myself on: https://github.com/bevyengine/bevy/issues/5834
-                                        // size: Size {
-                                        //     // `Val::Percent` doesn't work currently for wrapping
-                                        //     width: Val::Px(600.),
-                                        //     ..default()
-                                        // },
-                                        ..default()
-                                    }),
-                                )
-                                .insert(TextBox);
-                        });
-                });
+                },
+                color: Color::DARK_GRAY.into(),
+                ..default()
+            })
+            .insert(TextBox)
+            .insert(font_handle.clone())
+            .with_children(spawn_children_text(font_handle, String::from(
+                // "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularized in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
+                "Text Example a little longer trying to cross the width. Text Example a little longer trying to cross the width"
+            )));
         });
+    });
+}
+fn spawn_children_text(font_handle: Handle<Font>, text: String) -> impl FnOnce(&mut ChildBuilder) {
+    // text wrapping solution (bug workaround) based on: https://github.com/bevyengine/bevy/issues/1490
+    const FONT_SIZE: f32 = 30.;
+    move |parent: &mut ChildBuilder| {
+        // "Text Example",
+        for word in text.split_whitespace() {
+            parent.spawn_bundle(
+                TextBundle::from_section(
+                    word.to_string(),
+                    TextStyle {
+                        font: font_handle.clone(),
+                        font_size: FONT_SIZE,
+                        color: Color::WHITE,
+                    },
+                )
+                .with_style(Style {
+                    // this is required because of the bevy bug https://github.com/bevyengine/bevy/issues/5834
+                    max_size: Size::new(Val::Undefined, Val::Px(FONT_SIZE)),
+                    // this is the size of the spaces between words
+                    margin: UiRect::all(Val::Px(4.)),
+                    ..default()
+                }),
+            );
+        }
+    }
 }
 
 fn move_player(
     keyboard_input: Res<Input<KeyCode>>,
     mut query: Query<&mut Velocity, With<Player>>,
     // just for testing - to be taken out after proper triggers
+    mut commands: Commands,
     mut text_box_visibility: Query<&mut Visibility, With<TextBoxContainer>>,
-    mut text_box: Query<&mut Text, With<TextBox>>,
+    text_box: Query<(Entity, &Children, &Handle<Font>), With<TextBox>>,
 ) {
     if let Ok(mut player_velocity) = query.get_single_mut() {
         const SPEED: f32 = 3.;
@@ -240,15 +247,26 @@ fn move_player(
         if keyboard_input.pressed(KeyCode::Up) {
             player_velocity.0 += Vec3::new(0., SPEED, 0.);
 
-            // TODO:
-            // create proper trigger for the text box
+            // TODO: create signs for the text box
+            // clear text
+            let (entity, children, font_handle) = text_box.single();
+            commands.entity(entity).remove_children(children);
+            for child in children {
+                commands.entity(*child).despawn_recursive();
+            }
+            // open text_box
             text_box_visibility.single_mut().is_visible = true;
-            text_box.single_mut().sections[0].value =
-                "A totally new text from the trigger ^^".to_owned()
+            // new text
+            commands.entity(entity).add_children(spawn_children_text(
+                font_handle.clone(),
+                "A totally new text from the trigger ^^".to_owned(),
+            ))
         }
 
         if keyboard_input.pressed(KeyCode::Down) {
             player_velocity.0 += Vec3::new(0., -SPEED, 0.);
+
+            // close text_box
             text_box_visibility.single_mut().is_visible = false;
         }
     }
@@ -256,11 +274,12 @@ fn move_player(
 
 fn move_camera(
     player_query: Query<&Transform, With<Player>>,
-    mut camera_query: Query<(&mut Transform, With<Camera>), Without<Player>>,
+    mut camera_query: Query<&mut Transform, (With<Camera>, Without<Player>)>,
 ) {
     if let Ok(player_transform) = player_query.get_single() {
-        let mut camera_transform = camera_query.single_mut().0;
-        camera_transform.translation = player_transform.translation;
+        let mut camera_transform = camera_query.single_mut();
+        camera_transform.translation.x = player_transform.translation.x;
+        camera_transform.translation.y = player_transform.translation.y;
     }
 }
 
