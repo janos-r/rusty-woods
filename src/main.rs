@@ -4,7 +4,7 @@ use bevy_rapier2d::prelude::*;
 
 fn main() {
     App::new()
-          .insert_resource(WindowDescriptor {
+        .insert_resource(WindowDescriptor {
             title: "Bevy - My testing app ^_^".into(),
             ..default()
         })
