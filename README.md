@@ -1,8 +1,11 @@
 TODOs:
+- coliders in ldtk_ecs_bevy platformer example
+    - PR to substitute heron
+- signs
+    - open text by touching the sign
 - doors
 - walls
 - interaction with something in front
-- signs
 - save_game
     found a good example at:
     https://github.com/bevyengine/bevy/issues/1442

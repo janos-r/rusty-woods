@@ -178,7 +178,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     // justify_content: JustifyContent::FlexStart,
                     flex_wrap: FlexWrap::WrapReverse,
                     // vertical alignment
-                    align_content: AlignContent::FlexEnd,
+                    align_content: AlignContent::FlexStart,
                     ..default()
                 },
                 color: Color::DARK_GRAY.into(),
