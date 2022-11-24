@@ -28,7 +28,6 @@ fn main() {
         .add_system(spawn_player)
         .add_system(move_player)
         .add_system(move_camera)
-        .add_system(update_transform_from_velocity)
         .add_system(animate_sprite_system_velocity)
         .add_system(switch_level)
         .run();
@@ -39,9 +38,6 @@ struct Player;
 
 #[derive(Component, Default, Deref, DerefMut)]
 struct AnimationTimer(Timer);
-
-#[derive(Component, Default)]
-struct Velocity(Vec3);
 
 // Text box
 #[derive(Component)]
@@ -240,23 +236,23 @@ fn move_player(
     text_box: Query<(Entity, &Children, &Handle<Font>), With<TextBox>>,
 ) {
     if let Ok(mut player_velocity) = query.get_single_mut() {
-        const SPEED: f32 = 3.;
+        const SPEED: f32 = 200.;
 
-        let default = Vec3::default();
-        if player_velocity.0 != default {
-            player_velocity.0 = default;
+        let default = Vect::default();
+        if player_velocity.linvel != default {
+            player_velocity.linvel = default;
         }
 
         if keyboard_input.pressed(KeyCode::Left) {
-            player_velocity.0 += Vec3::new(-SPEED, 0., 0.);
+            player_velocity.linvel += Vect::new(-SPEED, 0.);
         }
 
         if keyboard_input.pressed(KeyCode::Right) {
-            player_velocity.0 += Vec3::new(SPEED, 0., 0.);
+            player_velocity.linvel += Vect::new(SPEED, 0.);
         }
 
         if keyboard_input.pressed(KeyCode::Up) {
-            player_velocity.0 += Vec3::new(0., SPEED, 0.);
+            player_velocity.linvel += Vect::new(0., SPEED);
 
             // TODO: create signs for the text box
             // clear text
@@ -275,7 +271,7 @@ fn move_player(
         }
 
         if keyboard_input.pressed(KeyCode::Down) {
-            player_velocity.0 += Vec3::new(0., -SPEED, 0.);
+            player_velocity.linvel += Vect::new(0., -SPEED);
 
             // close text_box
             text_box_visibility.single_mut().is_visible = false;
@@ -294,14 +290,6 @@ fn move_camera(
     }
 }
 
-fn update_transform_from_velocity(
-    mut query: Query<(&mut Transform, &Velocity), Changed<Velocity>>,
-) {
-    for (mut transform, velocity) in &mut query {
-        transform.translation += velocity.0;
-    }
-}
-
 fn animate_sprite_system_velocity(
     time: Res<Time>,
     texture_atlases: Res<Assets<TextureAtlas>>,
@@ -317,7 +305,7 @@ fn animate_sprite_system_velocity(
 ) {
     for (mut timer, mut sprite, texture_atlas_handle, velocity) in &mut query {
         timer.tick(time.delta());
-        if velocity.0 == Vec3::default() {
+        if velocity.linvel == Vect::default() {
             sprite.index = 0;
         } else if timer.finished() {
             let texture_atlas = texture_atlases.get(texture_atlas_handle).unwrap();
