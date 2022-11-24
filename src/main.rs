@@ -1,20 +1,25 @@
-use bevy::{prelude::*, render::texture::ImageSettings};
+use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 fn main() {
     App::new()
-        .insert_resource(WindowDescriptor {
-            title: "Bevy - My testing app ^_^".into(),
-            ..default()
-        })
-        .insert_resource(ImageSettings::default_nearest()) // prevents blurry sprites
         .insert_resource(RapierConfiguration {
             gravity: Vec2::ZERO,
             ..default()
         })
         .insert_resource(LevelSelection::Index(0))
-        .add_plugins(DefaultPlugins)
+        .add_plugins(
+            DefaultPlugins
+                .set(WindowPlugin {
+                    window: WindowDescriptor {
+                        title: "Bevy - My testing app ^_^".into(),
+                        ..default()
+                    },
+                    ..default()
+                })
+                .set(ImagePlugin::default_nearest()), // prevents blurry sprites
+        )
         .add_plugin(LdtkPlugin)
         .register_ldtk_entity::<PlayerBundle>("Entity1")
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
@@ -73,19 +78,24 @@ fn spawn_player(
 ) {
     if let Ok(player) = query_player.get_single_mut() {
         let texture_handle = asset_server.load("textures/rpg/chars/gabe/gabe-idle-run.png");
-        let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1);
+        let texture_atlas =
+            TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1, None, None);
         let texture_atlas_handle = texture_atlases.add(texture_atlas);
         commands
             .entity(player)
-            .insert(AnimationTimer(Timer::from_seconds(0.08, true)))
+            .insert(AnimationTimer(Timer::from_seconds(
+                0.08,
+                TimerMode::Repeating,
+            )))
             .insert(texture_atlas_handle)
             .insert(RigidBody::Dynamic)
             .insert(LockedAxes::ROTATION_LOCKED)
             // Position the collider relative to the rigid-body.
             .with_children(|parent| {
-                parent
-                    .spawn_bundle(TransformBundle::from(Transform::from_xyz(0., -8.0, 0.)))
-                    .insert(Collider::ball(8.));
+                parent.spawn((
+                    TransformBundle::from(Transform::from_xyz(0., -8.0, 0.)),
+                    Collider::ball(8.),
+                ));
             });
     }
 }
@@ -100,17 +110,17 @@ struct MySpriteBundle {
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Camera
-    commands.spawn_bundle(Camera2dBundle::default());
+    commands.spawn(Camera2dBundle::default());
 
     // Ldtk world
-    commands.spawn_bundle(LdtkWorldBundle {
+    commands.spawn(LdtkWorldBundle {
         ldtk_handle: asset_server.load("LDtk/world1.ldtk"),
         ..Default::default()
     });
 
     // Sprites
     commands
-        .spawn_bundle(MySpriteBundle {
+        .spawn(MySpriteBundle {
             sprite_bundle: SpriteBundle {
                 sprite: Sprite {
                     color: Color::rgb(0.7, 0.7, 0.7),
@@ -129,7 +139,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             y: 100.,
         });
 
-    commands.spawn_bundle(MySpriteBundle {
+    commands.spawn(MySpriteBundle {
         sprite_bundle: SpriteBundle {
             sprite: Sprite {
                 color: Color::rgb(0.7, 0.7, 0.1),
@@ -143,45 +153,45 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     });
 
     // Bottom text box
-    commands.spawn_bundle(NodeBundle {
+    commands.spawn(NodeBundle {
         style: Style {
             size: Size::new(Val::Percent(100.0), Val::Px(200.0)),
+            // align container to the bottom
+            align_self: AlignSelf::FlexEnd,
             // makes space bellow the box
-            align_items: AlignItems::FlexEnd,
+            align_items: AlignItems::FlexStart,
             justify_content: JustifyContent::Center,
             ..default()
         },
         // transparent container
-        color: Color::rgba(0.65, 0.65, 0.65, 0.).into(),
+        background_color: Color::rgba(0.65, 0.65, 0.65, 0.).into(),
         ..default()
     })
     .insert(TextBoxContainer)
     .with_children(|parent| {
         // box size, border thickness and color
-        parent.spawn_bundle(NodeBundle {
+        parent.spawn(NodeBundle {
             style: Style {
                 size: Size::new(Val::Percent(80.), Val::Percent(80.0)),
                 border: UiRect::all(Val::Px(6.0)),
                 ..default()
             },
-            color: Color::MIDNIGHT_BLUE.into(),
+            background_color: Color::MIDNIGHT_BLUE.into(),
             ..default()
         })
         .with_children(|parent| {
             // text background
             let font_handle = asset_server.load("fonts/FiraSans-Bold.ttf");
-            parent.spawn_bundle(NodeBundle {
+            parent.spawn(NodeBundle {
                 style: Style {
                     size: Size::new(Val::Percent(100.0), Val::Percent(100.)),
                     padding: UiRect::all(Val::Px(6.)),
-                    // horizontal alignment: left (start = default), center, right
-                    // justify_content: JustifyContent::FlexStart,
-                    flex_wrap: FlexWrap::WrapReverse,
-                    // vertical alignment
+                    // don't stretch verticaly
                     align_content: AlignContent::FlexStart,
+                    flex_wrap: FlexWrap::Wrap,
                     ..default()
                 },
-                color: Color::DARK_GRAY.into(),
+                background_color: Color::DARK_GRAY.into(),
                 ..default()
             })
             .insert(TextBox)
@@ -193,13 +203,14 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         });
     });
 }
+
 fn spawn_children_text(font_handle: Handle<Font>, text: String) -> impl FnOnce(&mut ChildBuilder) {
     // text wrapping solution (bug workaround) based on: https://github.com/bevyengine/bevy/issues/1490
     const FONT_SIZE: f32 = 30.;
     move |parent: &mut ChildBuilder| {
         // "Text Example",
         for word in text.split_whitespace() {
-            parent.spawn_bundle(
+            parent.spawn(
                 TextBundle::from_section(
                     word.to_string(),
                     TextStyle {

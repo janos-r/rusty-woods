@@ -1,6 +1,4 @@
 TODOs:
-- coliders in ldtk_ecs_bevy platformer example
-    - PR to substitute heron
 - signs
     - open text by touching the sign
 - doors
