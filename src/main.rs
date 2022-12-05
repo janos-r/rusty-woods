@@ -21,15 +21,17 @@ fn main() {
                 .set(ImagePlugin::default_nearest()), // prevents blurry sprites
         )
         .add_plugin(LdtkPlugin)
-        .register_ldtk_entity::<PlayerBundle>("Entity1")
+        .register_ldtk_entity::<PlayerBundle>("EntityPlayer")
+        .register_ldtk_entity::<SignBundle>("EntitySign")
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
         .add_plugin(RapierDebugRenderPlugin::default()) // draws borders around colliders
         .add_startup_system(setup)
         .add_system(spawn_player)
+        .add_system(spawn_sign)
         .add_system(move_player)
         .add_system(move_camera)
         .add_system(animate_sprite_system_velocity)
-        .add_system(switch_level)
+        .add_system(collision_events)
         .run();
 }
 
@@ -53,26 +55,22 @@ struct Destination {
 }
 
 // Local Bundles
-#[derive(Bundle, Default, LdtkEntity)]
+#[derive(Bundle, LdtkEntity)]
 struct PlayerBundle {
-    #[bundle]
-    sprite_sheet_bundle: SpriteSheetBundle,
-    animation_timer: AnimationTimer,
     player: Player,
+    sprite_sheet_bundle: SpriteSheetBundle,
     velocity: Velocity,
-    rigid_body: RigidBody,
-    locked_axes: LockedAxes,
     #[worldly]
     worldly: Worldly,
 }
 
 fn spawn_player(
     mut commands: Commands,
-    mut query_player: Query<Entity, Added<Player>>,
+    query_player: Query<Entity, Added<Player>>,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
-    if let Ok(player) = query_player.get_single_mut() {
+    if let Ok(player) = query_player.get_single() {
         let texture_handle = asset_server.load("textures/rpg/chars/gabe/gabe-idle-run.png");
         let texture_atlas =
             TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 7, 1, None, None);
@@ -89,17 +87,65 @@ fn spawn_player(
             // Position the collider relative to the rigid-body.
             .with_children(|parent| {
                 parent.spawn((
-                    TransformBundle::from(Transform::from_xyz(0., -8.0, 0.)),
+                    TransformBundle::from(Transform::from_xyz(0., -8., 0.)),
                     Collider::ball(8.),
                 ));
             });
     }
 }
 
+#[derive(Component, Default)]
+struct Sign;
+
+#[derive(Component, Default)]
+struct SignCollider;
+
+#[derive(Component, Default)]
+struct Text(String);
+
 #[derive(Bundle, LdtkEntity)]
+struct SignBundle {
+    sign: Sign,
+    #[sprite_sheet_bundle]
+    sprite_sheet_bundle: SpriteSheetBundle,
+    #[from_entity_instance]
+    text: Text,
+}
+
+impl From<EntityInstance> for Text {
+    fn from(entity_instance: EntityInstance) -> Text {
+        if let Some(field_instance) = entity_instance
+            .field_instances
+            .iter()
+            .find(|f| f.identifier == "String")
+        {
+            if let FieldValue::String(Some(text)) = &field_instance.value {
+                Text(text.to_owned())
+            } else {
+                default()
+            }
+        } else {
+            default()
+        }
+    }
+}
+
+fn spawn_sign(mut commands: Commands, query_sign: Query<Entity, Added<Sign>>) {
+    for sign in &query_sign {
+        commands.entity(sign).with_children(|parent| {
+            parent.spawn((
+                SignCollider,
+                // Position the collider relative to the rigid-body.
+                TransformBundle::from(Transform::from_xyz(0., -3., 0.)),
+                Collider::ball(8.),
+                ActiveEvents::COLLISION_EVENTS,
+            ));
+        });
+    }
+}
+
+#[derive(Bundle)]
 struct MySpriteBundle {
-    #[sprite_bundle]
-    #[bundle]
     sprite_bundle: SpriteBundle,
     collider: Collider,
 }
@@ -111,7 +157,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Ldtk world
     commands.spawn(LdtkWorldBundle {
         ldtk_handle: asset_server.load("LDtk/world1.ldtk"),
-        ..Default::default()
+        ..default()
     });
 
     // Sprites
@@ -182,7 +228,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 style: Style {
                     size: Size::new(Val::Percent(100.0), Val::Percent(100.)),
                     padding: UiRect::all(Val::Px(6.)),
-                    // don't stretch verticaly
+                    // don't stretch vertically
                     align_content: AlignContent::FlexStart,
                     flex_wrap: FlexWrap::Wrap,
                     ..default()
@@ -231,9 +277,6 @@ fn move_player(
     keyboard_input: Res<Input<KeyCode>>,
     mut query: Query<&mut Velocity, With<Player>>,
     // just for testing - to be taken out after proper triggers
-    mut commands: Commands,
-    mut text_box_visibility: Query<&mut Visibility, With<TextBoxContainer>>,
-    text_box: Query<(Entity, &Children, &Handle<Font>), With<TextBox>>,
 ) {
     if let Ok(mut player_velocity) = query.get_single_mut() {
         const SPEED: f32 = 200.;
@@ -246,35 +289,14 @@ fn move_player(
         if keyboard_input.pressed(KeyCode::Left) {
             player_velocity.linvel += Vect::new(-SPEED, 0.);
         }
-
         if keyboard_input.pressed(KeyCode::Right) {
             player_velocity.linvel += Vect::new(SPEED, 0.);
         }
-
         if keyboard_input.pressed(KeyCode::Up) {
             player_velocity.linvel += Vect::new(0., SPEED);
-
-            // TODO: create signs for the text box
-            // clear text
-            let (entity, children, font_handle) = text_box.single();
-            commands.entity(entity).remove_children(children);
-            for child in children {
-                commands.entity(*child).despawn_recursive();
-            }
-            // open text_box
-            text_box_visibility.single_mut().is_visible = true;
-            // new text
-            commands.entity(entity).add_children(spawn_children_text(
-                font_handle.clone(),
-                "A totally new text from the trigger ^^".to_owned(),
-            ))
         }
-
         if keyboard_input.pressed(KeyCode::Down) {
             player_velocity.linvel += Vect::new(0., -SPEED);
-
-            // close text_box
-            text_box_visibility.single_mut().is_visible = false;
         }
     }
 }
@@ -314,24 +336,61 @@ fn animate_sprite_system_velocity(
     }
 }
 
-fn switch_level(
+#[allow(clippy::too_many_arguments)]
+fn collision_events(
     mut collision_events: EventReader<CollisionEvent>,
+    // ↓ Doors
     mut player_query: Query<&mut Transform, With<Player>>,
     mut level: ResMut<LevelSelection>,
     destination_query: Query<&Destination>,
+    // ↓ Signs
+    sign_collider_query: Query<&Parent, With<SignCollider>>,
+    sign_query: Query<&Text>,
+    text_box_query: Query<(Entity, &Children, &Handle<Font>), With<TextBox>>,
+    mut commands: Commands,
+    mut text_box_visibility: Query<&mut Visibility, With<TextBoxContainer>>,
 ) {
     for collision_event in collision_events.iter() {
         if let CollisionEvent::Started(e1, e2, _) = collision_event {
             // lets not hope that the door will always be e1 - lets try both and also stop if it was first
             for entity in [e1, e2] {
                 if let Ok(destination) = destination_query.get(*entity) {
+                    // door - switch_level
                     if let Ok(mut player_transform) = player_query.get_single_mut() {
                         player_transform.translation.x = destination.x;
                         player_transform.translation.y = destination.y;
                         *level = LevelSelection::Index(destination.level);
                     }
                     break;
+                } else if let Ok(parent) = sign_collider_query.get(*entity) {
+                    // sign - display text
+                    if let Ok(text) = sign_query.get(parent.get()) {
+                        // clear text
+                        // despawning children (here the words)
+                        // issue: https://bevy-cheatbook.github.io/features/parent-child.html?highlight=remove_chil#despawning-child-entities
+                        let (entity, children, font_handle) = text_box_query.single();
+                        commands.entity(entity).remove_children(children);
+                        for child in children {
+                            commands.entity(*child).despawn_recursive();
+                        }
+                        // open text_box
+                        text_box_visibility.single_mut().is_visible = true;
+                        // new text
+                        commands.entity(entity).add_children(spawn_children_text(
+                            font_handle.clone(),
+                            text.0.to_owned(),
+                        ));
+                        break;
+                    }
                 };
+            }
+        } else if let CollisionEvent::Stopped(e1, e2, _) = collision_event {
+            for entity in [e1, e2] {
+                if sign_collider_query.contains(*entity) {
+                    // close text_box
+                    text_box_visibility.single_mut().is_visible = false;
+                    break;
+                }
             }
         }
     }

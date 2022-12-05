@@ -1,8 +1,10 @@
 TODOs:
 - signs
-    - open text by touching the sign
+    - add new free sprite sheet
+- split code into modules
 - doors
 - walls
+
 - interaction with something in front
 - save_game
     found a good example at:
