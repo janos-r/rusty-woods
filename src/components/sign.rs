@@ -4,6 +4,7 @@ use crate::*;
 pub struct Sign;
 
 #[derive(Component, Default)]
+// separate entity - so that it can be located relative to the sign
 pub struct SignCollider;
 
 #[derive(Component, Default)]

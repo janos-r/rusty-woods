@@ -10,7 +10,7 @@
 	},
 	"jsonVersion": "1.1.3",
 	"appBuildId": 458364,
-	"nextUid": 19,
+	"nextUid": 28,
 	"identifierStyle": "Capitalize",
 	"worldLayout": "GridVania",
 	"worldGridWidth": 256,
@@ -257,6 +257,154 @@
 			"pivotX": 0.5,
 			"pivotY": 0.5,
 			"fieldDefs": []
+		},
+		{
+			"identifier": "EntityDoor",
+			"uid": 19,
+			"tags": [],
+			"width": 48,
+			"height": 48,
+			"resizableX": true,
+			"resizableY": true,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 0.08,
+			"lineOpacity": 0,
+			"hollow": false,
+			"color": "#94D9B3",
+			"renderMode": "Tile",
+			"showName": true,
+			"tilesetId": 9,
+			"tileId": 2,
+			"tileRenderMode": "FitInside",
+			"tileRect": { "tilesetUid": 9, "x": 48, "y": 0, "w": 24, "h": 24 },
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0.5,
+			"pivotY": 0.5,
+			"fieldDefs": [
+				{
+					"identifier": "Entity_ref",
+					"__type": "EntityRef",
+					"uid": 22,
+					"type": "F_EntityRef",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "RefLinkBetweenCenters",
+					"editorDisplayPos": "Above",
+					"editorAlwaysShow": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": true,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "Direction",
+					"__type": "LocalEnum.Direction",
+					"uid": 25,
+					"type": "F_Enum(24)",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "ValueOnly",
+					"editorDisplayPos": "Center",
+					"editorAlwaysShow": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "DestinationLevel",
+					"__type": "String",
+					"uid": 26,
+					"type": "F_String",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "ValueOnly",
+					"editorDisplayPos": "Above",
+					"editorAlwaysShow": false,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_String",
+						"params": ["Level_0"]
+					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "DestinationXY",
+					"__type": "Point",
+					"uid": 27,
+					"type": "F_Point",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "PointStar",
+					"editorDisplayPos": "Above",
+					"editorAlwaysShow": false,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefTags": [],
+					"tilesetUid": null
+				}
+			]
 		}
 	], "tilesets": [
 		{
@@ -300,7 +448,12 @@
 			"savedSelections": [],
 			"cachedPixelData": { "opaqueTiles": "0000000", "averageColors": "6756685567557755685568667866" }
 		}
-	], "enums": [], "externalEnums": [], "levelFields": [] },
+	], "enums": [{ "identifier": "Direction", "uid": 24, "values": [
+		{ "id": "Up", "tileId": 64, "color": 10066329, "__tileSrcRect": [0,64,16,16] },
+		{ "id": "Right", "tileId": 66, "color": 10066329, "__tileSrcRect": [32,64,16,16] },
+		{ "id": "Down", "tileId": 65, "color": 10066329, "__tileSrcRect": [16,64,16,16] },
+		{ "id": "Left", "tileId": 67, "color": 10066329, "__tileSrcRect": [48,64,16,16] }
+	], "iconTilesetUid": 2, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }], "externalEnums": [], "levelFields": [] },
 	"levels": [
 		{
 			"identifier": "Level_0",
@@ -396,6 +549,39 @@
 								"id": "V_String",
 								"params": ["Text on a sign!"]
 							}] }]
+						},
+						{
+							"__identifier": "EntityDoor",
+							"__grid": [22,11],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": { "tilesetUid": 9, "x": 48, "y": 0, "w": 24, "h": 24 },
+							"__smartColor": "#94D9B3",
+							"iid": "10230ec0-7820-11ed-9be6-638960d9083d",
+							"width": 48,
+							"height": 48,
+							"defUid": 19,
+							"px": [360,184],
+							"fieldInstances": [
+								{ "__identifier": "Entity_ref", "__value": {
+									"entityIid": "16b38210-7820-11ed-9be6-d5d9688f7211",
+									"layerIid": "cb1238d1-5110-11ed-b5f8-3d5549b1cdce",
+									"levelIid": "cb1238d0-5110-11ed-b5f8-774d9bde9a1c",
+									"worldIid": "e0ae59c0-7820-11ed-b161-ef776636c58a"
+								}, "__type": "EntityRef", "__tile": null, "defUid": 22, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["16b38210-7820-11ed-9be6-d5d9688f7211"]
+								}] },
+								{ "__identifier": "Direction", "__value": "Left", "__type": "LocalEnum.Direction", "__tile": null, "defUid": 25, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Left"]
+								}] },
+								{ "__identifier": "DestinationLevel", "__value": "Level_0", "__type": "String", "__tile": null, "defUid": 26, "realEditorValues": [] },
+								{ "__identifier": "DestinationXY", "__value": { "cx": 22, "cy": 1 }, "__type": "Point", "__tile": null, "defUid": 27, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["22,1"]
+								}] }
+							]
 						}
 					]
 				},
@@ -509,7 +695,38 @@
 					"seed": 1689592,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "EntityDoor",
+							"__grid": [1,12],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": { "tilesetUid": 9, "x": 48, "y": 0, "w": 24, "h": 24 },
+							"__smartColor": "#94D9B3",
+							"iid": "16b38210-7820-11ed-9be6-d5d9688f7211",
+							"width": 48,
+							"height": 48,
+							"defUid": 19,
+							"px": [24,200],
+							"fieldInstances": [
+								{ "__identifier": "Entity_ref", "__value": {
+									"entityIid": "10230ec0-7820-11ed-9be6-638960d9083d",
+									"layerIid": "958fd950-5110-11ed-95cb-c9424ba5a7b9",
+									"levelIid": "f02e8880-2a00-11ed-ad8b-a33bae0ac0ba",
+									"worldIid": "e0ae59c0-7820-11ed-b161-ef776636c58a"
+								}, "__type": "EntityRef", "__tile": null, "defUid": 22, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["10230ec0-7820-11ed-9be6-638960d9083d"]
+								}] },
+								{ "__identifier": "Direction", "__value": "Right", "__type": "LocalEnum.Direction", "__tile": null, "defUid": 25, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Right"]
+								}] },
+								{ "__identifier": "DestinationLevel", "__value": "Level_0", "__type": "String", "__tile": null, "defUid": 26, "realEditorValues": [] },
+								{ "__identifier": "DestinationXY", "__value": null, "__type": "Point", "__tile": null, "defUid": 27, "realEditorValues": [] }
+							]
+						}
+					]
 				},
 				{
 					"__identifier": "Tiles",

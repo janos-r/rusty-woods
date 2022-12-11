@@ -26,6 +26,7 @@ fn main() {
         .add_plugin(LdtkPlugin)
         .register_ldtk_entity::<components::player::PlayerBundle>("EntityPlayer")
         .register_ldtk_entity::<SignBundle>("EntitySign")
+        .register_ldtk_entity::<DoorBundle>("EntityDoor")
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
         .add_plugin(RapierDebugRenderPlugin::default()) // draws borders around colliders
         .add_system(components::player::spawn_player)
@@ -71,9 +72,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         })
         .insert(ActiveEvents::COLLISION_EVENTS)
         .insert(Destination {
-            level: 1,
-            x: 0.,
-            y: 100.,
+            level: "Level_1".to_owned(),
+            coords: Vec3::new(0., 100., 3.),
         });
 
     commands.spawn(MySpriteBundle {
@@ -170,9 +170,8 @@ fn collision_events(
                 if let Ok(destination) = destination_query.get(*entity) {
                     // door - switch_level
                     if let Ok(mut player_transform) = player_query.get_single_mut() {
-                        player_transform.translation.x = destination.x;
-                        player_transform.translation.y = destination.y;
-                        *level = LevelSelection::Index(destination.level);
+                        *level = LevelSelection::Identifier(destination.level.clone());
+                        player_transform.translation = destination.coords;
                     }
                     break;
                 } else if let Ok(parent) = sign_collider_query.get(*entity) {

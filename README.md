@@ -1,8 +1,7 @@
 TODOs:
-- signs
-    - add new free sprite sheet
-- split code into modules
 - doors
+    - across levels
+- add new free sprite sheet
 - walls
 
 - interaction with something in front
