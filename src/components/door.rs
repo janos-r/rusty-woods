@@ -1,59 +1,92 @@
-use crate::*;
-use bevy_ecs_ldtk::utils::ldtk_grid_coords_to_translation;
-
 use super::with_collision_events;
+use crate::*;
+use bevy_ecs_ldtk::utils::ldtk_pixel_coords_to_translation_pivoted;
 
-#[derive(Component, Default)]
-pub struct Destination {
-    pub level: String,
-    pub coords: Vec3,
+#[derive(Clone, Component, Default)]
+pub struct DoorRef {
+    // for switching the level
+    pub target_level_iid: LevelSelection,
+    // for saving to the player where he wants to go
+    // after the level and its target spawn, the target should realize the player is trying to reach it
+    pub target_entity_iid: EntityIid,
 }
 
-// TODO: not necessary?
-// #[derive(Component, Default)]
-// pub struct Door;
+#[derive(Component, Default)]
+pub struct Door;
 
 #[derive(Bundle, LdtkEntity)]
 pub struct DoorBundle {
-    // door: Door,
+    door: Door,
     #[sprite_sheet_bundle]
     sprite_sheet_bundle: SpriteSheetBundle,
-    #[from_entity_instance]
-    destination: Destination,
     collider: Collider,
     #[with(with_collision_events)]
     active_events: ActiveEvents,
+    #[from_entity_instance]
+    linked_door: DoorRef,
+    #[from_entity_instance]
+    spawn_direction: super::Direction,
+    #[from_entity_instance]
+    entity_instance: EntityInstance,
 }
 
-impl From<EntityInstance> for Destination {
+impl From<EntityInstance> for DoorRef {
     fn from(entity_instance: EntityInstance) -> Self {
         let Some(field_instance) = entity_instance
             .field_instances
             .iter()
-            .find(|f| f.identifier == "DestinationLevel") else {
+            .find(|f| f.identifier == "Entity_ref") else {
             return default();
         };
-        let FieldValue::String(Some(destination_level)) = &field_instance.value else {
+        let FieldValue::EntityRef(Some(entity_ref)) = &field_instance.value else {
             return default();
         };
-        let Some(field_instance) = entity_instance
-            .field_instances
-            .iter()
-            .find(|f| f.identifier == "DestinationXY") else {
-            return default();
-        };
-        let FieldValue::Point(Some(point)) = field_instance.value else {
-            return default();
-        };
+        DoorRef {
+            target_level_iid: LevelSelection::Iid(entity_ref.level_iid.clone()),
+            // Known issue: It has to be this complicated, because I don't know if there is a way to fetch the target Point here.
+            // The target (and its Point) spawns only after its level spawns.
+            // Discussed in: https://github.com/Trouv/bevy_ecs_ldtk/discussions/113
+            target_entity_iid: EntityIid(entity_ref.entity_iid.clone()),
+        }
+    }
+}
 
-        // TODO: take the grid_size and grid_height from the target level/layer
-        let grid_height = 16;
-        let grid_size = IVec2 { x: 16, y: 16 };
-
-        let coords = ldtk_grid_coords_to_translation(point, grid_height, grid_size).extend(3.);
-        Destination {
-            level: destination_level.clone(),
-            coords,
+pub fn spawn_door(
+    mut _commands: Commands,
+    query_door: Query<(&EntityInstance, &super::Direction), Added<Door>>,
+    mut player_query: Query<(&EntityIid, &mut Transform), With<Player>>,
+    level_query: Query<&Handle<LdtkLevel>>,
+    levels: Res<Assets<LdtkLevel>>,
+) {
+    for (entity_instance, direction) in &query_door {
+        if let Ok((player_target_iid, mut player_transform)) = player_query.get_single_mut() {
+            if player_target_iid.0 == entity_instance.iid {
+                for level_handle in &level_query {
+                    let level_px_hei = levels
+                        .get(level_handle)
+                        .expect("Level should be loaded")
+                        .level
+                        .px_hei;
+                    let entity_size = IVec2::new(entity_instance.width, entity_instance.height);
+                    let door_location = ldtk_pixel_coords_to_translation_pivoted(
+                        entity_instance.px,
+                        level_px_hei,
+                        entity_size,
+                        entity_instance.pivot,
+                    );
+                    // spawn close from the door, not on top
+                    const DISTANCE: f32 = 25.;
+                    let door_direction: Vec2 = match direction {
+                        super::Direction::Up => Vec2::new(0., DISTANCE),
+                        super::Direction::Right => Vec2::new(DISTANCE, 0.),
+                        super::Direction::Down => Vec2::new(0., -DISTANCE),
+                        super::Direction::Left => Vec2::new(-DISTANCE, 0.),
+                    };
+                    let spawn_location = door_location + door_direction;
+                    player_transform.translation.x = spawn_location.x;
+                    player_transform.translation.y = spawn_location.y;
+                }
+            }
         }
     }
 }

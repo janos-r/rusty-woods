@@ -11,6 +11,7 @@ pub struct PlayerBundle {
     velocity: Velocity,
     #[worldly]
     worldly: Worldly,
+    teleporting_to_entity_iid: EntityIid,
 }
 
 pub fn spawn_player(

@@ -10,7 +10,7 @@ pub fn spawn_children_text(
     font_handle: Handle<Font>,
     text: String,
 ) -> impl FnOnce(&mut ChildBuilder) {
-    // text wrapping solution (bug workaround) based on: https://github.com/bevyengine/bevy/issues/1490
+    // Known issue: text wrapping solution (bug workaround) based on: https://github.com/bevyengine/bevy/issues/1490
     const FONT_SIZE: f32 = 30.;
     move |parent: &mut ChildBuilder| {
         // "Text Example",
