@@ -1,4 +1,4 @@
-use super::with_collision_events;
+use super::*;
 use crate::*;
 use bevy_ecs_ldtk::utils::ldtk_pixel_coords_to_translation_pivoted;
 
@@ -13,6 +13,18 @@ pub struct DoorRef {
 
 #[derive(Component, Default)]
 pub struct Door;
+
+impl Door {
+    const SPAWN_DISTANCE: f32 = 25.;
+    fn spawn_offset(direction: &super::Direction) -> Vec2 {
+        match direction {
+            super::Direction::Up => Vec2::new(0., Door::SPAWN_DISTANCE),
+            super::Direction::Right => Vec2::new(Door::SPAWN_DISTANCE, 0.),
+            super::Direction::Down => Vec2::new(0., -Door::SPAWN_DISTANCE),
+            super::Direction::Left => Vec2::new(-Door::SPAWN_DISTANCE, 0.),
+        }
+    }
+}
 
 #[derive(Bundle, LdtkEntity)]
 pub struct DoorBundle {
@@ -75,14 +87,7 @@ pub fn spawn_door(
                         entity_instance.pivot,
                     );
                     // spawn close from the door, not on top
-                    const DISTANCE: f32 = 25.;
-                    let door_direction: Vec2 = match direction {
-                        super::Direction::Up => Vec2::new(0., DISTANCE),
-                        super::Direction::Right => Vec2::new(DISTANCE, 0.),
-                        super::Direction::Down => Vec2::new(0., -DISTANCE),
-                        super::Direction::Left => Vec2::new(-DISTANCE, 0.),
-                    };
-                    let spawn_location = door_location + door_direction;
+                    let spawn_location = door_location + Door::spawn_offset(direction);
                     player_transform.translation.x = spawn_location.x;
                     player_transform.translation.y = spawn_location.y;
                 }

@@ -43,8 +43,8 @@ pub fn spawn_sign(mut commands: Commands, query_sign: Query<Entity, Added<Sign>>
             parent.spawn((
                 SignCollider,
                 // Position the collider relative to the rigid-body.
-                TransformBundle::from(Transform::from_xyz(0., -3., 0.)),
-                Collider::ball(8.),
+                TransformBundle::from(Transform::from_xyz(0., -2., 0.)),
+                Collider::ball(6.),
                 ActiveEvents::COLLISION_EVENTS,
             ));
         });

@@ -1,7 +1,17 @@
 ### TODOs
 
-- add new free sprite sheet
+- z-axis
+  - having it derived from the y-axis could make it possible to walk behind objects
 - walls
+  - wall collider combiner
+    - compare platformer vs ludum and use one
+- add new free sprite sheet
+  - source: <https://itch.io/game-assets/free/tag-2d/tag-sprites>
+  - use doors on sprites
+  - combine with walls
+
+### Optional
+
 - interaction with something in front
 - save_game
     found a good example at:
