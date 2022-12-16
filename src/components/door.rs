@@ -18,10 +18,10 @@ impl Door {
     const SPAWN_DISTANCE: f32 = 25.;
     fn spawn_offset(direction: &super::Direction) -> Vec2 {
         match direction {
-            super::Direction::Up => Vec2::new(0., Door::SPAWN_DISTANCE),
-            super::Direction::Right => Vec2::new(Door::SPAWN_DISTANCE, 0.),
-            super::Direction::Down => Vec2::new(0., -Door::SPAWN_DISTANCE),
-            super::Direction::Left => Vec2::new(-Door::SPAWN_DISTANCE, 0.),
+            super::Direction::Up => Vec2::new(0., Self::SPAWN_DISTANCE),
+            super::Direction::Right => Vec2::new(Self::SPAWN_DISTANCE, 0.),
+            super::Direction::Down => Vec2::new(0., -Self::SPAWN_DISTANCE),
+            super::Direction::Left => Vec2::new(-Self::SPAWN_DISTANCE, 0.),
         }
     }
 }
@@ -29,6 +29,7 @@ impl Door {
 #[derive(Bundle, LdtkEntity)]
 pub struct DoorBundle {
     door: Door,
+    z_from_x: DeriveZfromY,
     #[sprite_sheet_bundle]
     sprite_sheet_bundle: SpriteSheetBundle,
     collider: Collider,
@@ -88,8 +89,11 @@ pub fn spawn_door(
                     );
                     // spawn close from the door, not on top
                     let spawn_location = door_location + Door::spawn_offset(direction);
-                    player_transform.translation.x = spawn_location.x;
-                    player_transform.translation.y = spawn_location.y;
+                    player_transform.translation = Vec3::new(
+                        spawn_location.x,
+                        spawn_location.y,
+                        DeriveZfromY::get(spawn_location.y),
+                    )
                 }
             }
         }

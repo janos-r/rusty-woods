@@ -36,8 +36,10 @@ fn main() {
         .add_startup_system(setup_ui)
         .add_system(spawn_sign)
         .add_system(spawn_door)
+        .add_system(spawn_derive_z_from_y)
         .add_system(move_player)
         .add_system(move_camera)
+        .add_system(move_derive_z_from_y)
         .add_system(animate_sprite_system_velocity)
         .add_system(collision_events)
         .run();

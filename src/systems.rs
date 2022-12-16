@@ -30,6 +30,14 @@ pub fn move_player(
     }
 }
 
+pub fn move_derive_z_from_y(
+    mut player_query: Query<&mut Transform, (Changed<Transform>, With<Player>)>,
+) {
+    if let Ok(mut transform) = player_query.get_single_mut() {
+        transform.translation.z = DeriveZfromY::get(transform.translation.y);
+    }
+}
+
 pub fn move_camera(
     player_query: Query<&Transform, With<Player>>,
     mut camera_query: Query<&mut Transform, (With<Camera>, Without<Player>)>,

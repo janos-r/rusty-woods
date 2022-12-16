@@ -1,7 +1,5 @@
 ### TODOs
 
-- z-axis
-  - having it derived from the y-axis could make it possible to walk behind objects
 - walls
   - wall collider combiner
     - compare platformer vs ludum and use one

@@ -53,3 +53,30 @@ impl From<EntityInstance> for Direction {
 fn with_collision_events(_: EntityInstance) -> ActiveEvents {
     ActiveEvents::COLLISION_EVENTS
 }
+
+#[derive(Component, Default)]
+pub struct DeriveZfromY;
+
+impl DeriveZfromY {
+    /*
+    The default camera is on Z 1000, lets keep that.
+    Dividing Y by 100 (the coefficient) and subtracting from the camera (max possible "mirror_base")
+    at 1k would allow for a level up to 100k px vertically.
+    Lets keep some room just for good measure. Subtracting from a 100 base gives space for up to 10k px.
+    If a higher level (px) would be necessary, the coefficient can be also adjusted.
+    btw the level and other entities spawn around Z 0-3.
+    */
+    const MIRROR_BASE: f32 = 100.;
+    const COEFFICIENT: f32 = 100.;
+    pub fn get(y: f32) -> f32 {
+        Self::MIRROR_BASE - y / Self::COEFFICIENT
+    }
+}
+
+pub fn spawn_derive_z_from_y(
+    mut query: Query<&mut Transform, (Added<Transform>, With<DeriveZfromY>)>,
+) {
+    for mut transform in &mut query {
+        transform.translation.z = DeriveZfromY::get(transform.translation.y);
+    }
+}
