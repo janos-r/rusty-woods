@@ -4,11 +4,15 @@ use crate::*;
 #[derive(Component, Default)]
 pub struct Player;
 
+#[derive(Component, Default)]
+pub struct Moving(pub bool);
+
 #[derive(Bundle, LdtkEntity)]
 pub struct PlayerBundle {
     player: Player,
     sprite_sheet_bundle: SpriteSheetBundle,
     velocity: Velocity,
+    moving: Moving,
     #[worldly]
     worldly: Worldly,
     teleporting_to_entity_iid: EntityIid,
@@ -34,6 +38,7 @@ pub fn spawn_player(
             .insert(texture_atlas_handle)
             .insert(RigidBody::Dynamic)
             .insert(LockedAxes::ROTATION_LOCKED)
+            .insert(super::Direction::Down)
             // Position the collider relative to the rigid-body.
             .with_children(|parent| {
                 parent.spawn((

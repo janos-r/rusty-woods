@@ -5,36 +5,42 @@ use crate::*;
 
 pub fn move_player(
     keyboard_input: Res<Input<KeyCode>>,
-    mut query: Query<&mut Velocity, With<Player>>,
+    mut query: Query<(&mut Velocity, &mut Moving), With<Player>>,
 ) {
-    if let Ok(mut player_velocity) = query.get_single_mut() {
+    if let Ok((mut velocity, mut moving)) = query.get_single_mut() {
         const SPEED: f32 = 200.;
 
         let default = Vect::default();
-        if player_velocity.linvel != default {
-            player_velocity.linvel = default;
+        if velocity.linvel != default {
+            velocity.linvel = default;
         }
 
         if keyboard_input.pressed(KeyCode::Left) {
-            player_velocity.linvel += Vect::new(-SPEED, 0.);
+            velocity.linvel += Vect::new(-SPEED, 0.);
         }
         if keyboard_input.pressed(KeyCode::Right) {
-            player_velocity.linvel += Vect::new(SPEED, 0.);
+            velocity.linvel += Vect::new(SPEED, 0.);
         }
         if keyboard_input.pressed(KeyCode::Up) {
-            player_velocity.linvel += Vect::new(0., SPEED);
+            velocity.linvel += Vect::new(0., SPEED);
         }
         if keyboard_input.pressed(KeyCode::Down) {
-            player_velocity.linvel += Vect::new(0., -SPEED);
+            velocity.linvel += Vect::new(0., -SPEED);
+        }
+
+        if velocity.linvel != default {
+            moving.0 = true;
+        } else if moving.0 {
+            moving.0 = false;
         }
     }
 }
 
-pub fn move_derive_z_from_y(
+pub fn player_derive_z_from_y(
     mut player_query: Query<&mut Transform, (Changed<Transform>, With<Player>)>,
 ) {
     if let Ok(mut transform) = player_query.get_single_mut() {
-        transform.translation.z = DeriveZfromY::get(transform.translation.y);
+        transform.translation.z = DeriveZFromY::get(transform.translation.y);
     }
 }
 
@@ -49,7 +55,7 @@ pub fn move_camera(
     }
 }
 
-pub fn animate_sprite_system_velocity(
+pub fn animate_player(
     time: Res<Time>,
     texture_atlases: Res<Assets<TextureAtlas>>,
     mut query: Query<
@@ -57,14 +63,14 @@ pub fn animate_sprite_system_velocity(
             &mut components::AnimationTimer,
             &mut TextureAtlasSprite,
             &Handle<TextureAtlas>,
-            &Velocity,
+            &Moving,
         ),
-        Changed<Velocity>,
+        (Changed<Moving>, With<Player>),
     >,
 ) {
-    for (mut timer, mut sprite, texture_atlas_handle, velocity) in &mut query {
+    if let Ok((mut timer, mut sprite, texture_atlas_handle, moving)) = query.get_single_mut() {
         timer.tick(time.delta());
-        if velocity.linvel == Vect::default() {
+        if !moving.0 {
             sprite.index = 0;
         } else if timer.finished() {
             let texture_atlas = texture_atlases.get(texture_atlas_handle).unwrap();

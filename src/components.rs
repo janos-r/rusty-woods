@@ -55,9 +55,9 @@ fn with_collision_events(_: EntityInstance) -> ActiveEvents {
 }
 
 #[derive(Component, Default)]
-pub struct DeriveZfromY;
+pub struct DeriveZFromY;
 
-impl DeriveZfromY {
+impl DeriveZFromY {
     /*
     The default camera is on Z 1000, lets keep that.
     Dividing Y by 100 (the coefficient) and subtracting from the camera (max possible "mirror_base")
@@ -74,9 +74,9 @@ impl DeriveZfromY {
 }
 
 pub fn spawn_derive_z_from_y(
-    mut query: Query<&mut Transform, (Added<Transform>, With<DeriveZfromY>)>,
+    mut query: Query<&mut Transform, (Added<Transform>, With<DeriveZFromY>)>,
 ) {
     for mut transform in &mut query {
-        transform.translation.z = DeriveZfromY::get(transform.translation.y);
+        transform.translation.z = DeriveZFromY::get(transform.translation.y);
     }
 }

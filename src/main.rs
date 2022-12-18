@@ -9,11 +9,7 @@ use systems::*;
 
 fn main() {
     App::new()
-        .insert_resource(RapierConfiguration {
-            gravity: Vec2::ZERO,
-            ..default()
-        })
-        .insert_resource(LevelSelection::Index(0))
+        // ↓ Bevy
         .add_plugins(
             DefaultPlugins
                 .set(WindowPlugin {
@@ -25,24 +21,41 @@ fn main() {
                 })
                 .set(ImagePlugin::default_nearest()), // prevents blurry sprites
         )
-        .add_plugin(LdtkPlugin)
-        .register_ldtk_entity::<components::player::PlayerBundle>("EntityPlayer")
-        .register_ldtk_entity::<SignBundle>("EntitySign")
-        .register_ldtk_entity::<DoorBundle>("EntityDoor")
+        // ↓ Rapier
+        .insert_resource(RapierConfiguration {
+            gravity: Vec2::ZERO,
+            ..default()
+        })
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
         .add_plugin(RapierDebugRenderPlugin::default()) // draws borders around colliders
-        .add_system(components::player::spawn_player)
+        // ↓ LDtk
+        .add_plugin(LdtkPlugin)
+        .insert_resource(LevelSelection::Index(0))
+        // ↓ Setup
         .add_startup_system(setup)
         .add_startup_system(setup_ui)
-        .add_system(spawn_sign)
-        .add_system(spawn_door)
-        .add_system(spawn_derive_z_from_y)
+        .add_plugin(SpawnPlugin)
+        // ↓ Run
         .add_system(move_player)
         .add_system(move_camera)
-        .add_system(move_derive_z_from_y)
-        .add_system(animate_sprite_system_velocity)
+        .add_system(animate_player)
+        .add_system(player_derive_z_from_y)
         .add_system(collision_events)
         .run();
+}
+
+struct SpawnPlugin;
+
+impl Plugin for SpawnPlugin {
+    fn build(&self, app: &mut App) {
+        app.register_ldtk_entity::<PlayerBundle>("EntityPlayer")
+            .register_ldtk_entity::<SignBundle>("EntitySign")
+            .register_ldtk_entity::<DoorBundle>("EntityDoor")
+            .add_system(spawn_player)
+            .add_system(spawn_sign)
+            .add_system(spawn_door)
+            .add_system(spawn_derive_z_from_y);
+    }
 }
 
 #[derive(Bundle)]

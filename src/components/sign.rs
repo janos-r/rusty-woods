@@ -13,7 +13,7 @@ pub struct SignText(pub String);
 #[derive(Bundle, LdtkEntity)]
 pub struct SignBundle {
     sign: Sign,
-    z_from_x: DeriveZfromY,
+    z_from_y: DeriveZFromY,
     #[sprite_sheet_bundle]
     sprite_sheet_bundle: SpriteSheetBundle,
     #[from_entity_instance]

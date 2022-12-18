@@ -29,7 +29,7 @@ impl Door {
 #[derive(Bundle, LdtkEntity)]
 pub struct DoorBundle {
     door: Door,
-    z_from_x: DeriveZfromY,
+    z_from_y: DeriveZFromY,
     #[sprite_sheet_bundle]
     sprite_sheet_bundle: SpriteSheetBundle,
     collider: Collider,
@@ -92,7 +92,7 @@ pub fn spawn_door(
                     player_transform.translation = Vec3::new(
                         spawn_location.x,
                         spawn_location.y,
-                        DeriveZfromY::get(spawn_location.y),
+                        DeriveZFromY::get(spawn_location.y),
                     )
                 }
             }

@@ -7,6 +7,7 @@
   - source: <https://itch.io/game-assets/free/tag-2d/tag-sprites>
   - use doors on sprites
   - combine with walls
+- animate non-player sprites
 
 ### Optional
 
