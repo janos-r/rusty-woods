@@ -65,7 +65,7 @@ pub fn animate_player(
             &Handle<TextureAtlas>,
             &Moving,
         ),
-        (Changed<Moving>, With<Player>),
+        Changed<Moving>,
     >,
 ) {
     if let Ok((mut timer, mut sprite, texture_atlas_handle, moving)) = query.get_single_mut() {

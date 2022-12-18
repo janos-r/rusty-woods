@@ -1,8 +1,5 @@
 ### TODOs
 
-- walls
-  - wall collider combiner
-    - compare platformer vs ludum and use one
 - add new free sprite sheet
   - source: <https://itch.io/game-assets/free/tag-2d/tag-sprites>
   - use doors on sprites

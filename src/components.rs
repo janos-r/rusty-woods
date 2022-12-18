@@ -2,7 +2,8 @@ pub mod door;
 pub mod player;
 pub mod sign;
 pub mod ui;
-pub use {door::*, player::*, sign::*, ui::*};
+pub mod wall;
+pub use {door::*, player::*, sign::*, ui::*, wall::*};
 
 use crate::*;
 
