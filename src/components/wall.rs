@@ -42,7 +42,6 @@ pub fn spawn_wall_collision(
     }
 
     /// A simple rectangle type representing a wall of any size
-    #[derive(Clone, Debug)]
     struct Rect {
         left: i32,
         right: i32,

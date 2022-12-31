@@ -68,7 +68,15 @@ struct MySpriteBundle {
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Camera
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn({
+        Camera2dBundle {
+            projection: OrthographicProjection {
+                scale: 0.5,
+                ..default()
+            },
+            ..default()
+        }
+    });
 
     // Ldtk world
     commands.spawn(LdtkWorldBundle {

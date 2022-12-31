@@ -1,10 +1,14 @@
 ### TODOs
 
 - add new free sprite sheet
-  - source: <https://itch.io/game-assets/free/tag-2d/tag-sprites>
+  - build map tiling
+    - add fence
+    - add trees
+  - use signs and walls on new map
   - use doors on sprites
-  - combine with walls
-- animate non-player sprites
+- animation enhancements
+  - add animation stages from ludum (animate while standing)
+  - patrol
 
 ### Optional
 
@@ -15,6 +19,11 @@
 
 bevy game list\
 <https://itch.io/search?q=bevy>
+
+### Sprite source
+
+- bevy assets
+- <https://game-endeavor.itch.io/mystic-woods>
 
 ### Issues I found workarounds for
 
