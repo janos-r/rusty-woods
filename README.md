@@ -1,11 +1,10 @@
 ### TODOs
 
 - add new free sprite sheet
-  - build map tiling
-    - add fence
-    - add trees
   - use signs and walls on new map
-  - use doors on sprites
+  - add houses
+    - use doors on sprites
+    - interior tiles
 - animation enhancements
   - add animation stages from ludum (animate while standing)
   - patrol
