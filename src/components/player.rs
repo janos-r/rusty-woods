@@ -44,6 +44,7 @@ pub fn spawn_player(
                 parent.spawn((
                     TransformBundle::from(Transform::from_xyz(0., -8., 0.)),
                     Collider::ball(8.),
+                    Friction::new(0.),
                 ));
             });
     }

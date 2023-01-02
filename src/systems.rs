@@ -5,9 +5,9 @@ use crate::*;
 
 pub fn move_player(
     keyboard_input: Res<Input<KeyCode>>,
-    mut query: Query<(&mut Velocity, &mut Moving), With<Player>>,
+    mut query: Query<(&mut Velocity, &mut Moving, &mut TextureAtlasSprite), With<Player>>,
 ) {
-    if let Ok((mut velocity, mut moving)) = query.get_single_mut() {
+    if let Ok((mut velocity, mut moving, mut sprite)) = query.get_single_mut() {
         const SPEED: f32 = 200.;
 
         let default = Vect::default();
@@ -17,9 +17,11 @@ pub fn move_player(
 
         if keyboard_input.pressed(KeyCode::Left) {
             velocity.linvel += Vect::new(-SPEED, 0.);
+            sprite.flip_x = true;
         }
         if keyboard_input.pressed(KeyCode::Right) {
             velocity.linvel += Vect::new(SPEED, 0.);
+            sprite.flip_x = false;
         }
         if keyboard_input.pressed(KeyCode::Up) {
             velocity.linvel += Vect::new(0., SPEED);
@@ -28,6 +30,8 @@ pub fn move_player(
             velocity.linvel += Vect::new(0., -SPEED);
         }
 
+        // This keeps the animation running only while pressing the movement keys. Not from external forces like standing on corners.
+        // While pressing, every frame is considered as Changed<Moving>
         if velocity.linvel != default {
             moving.0 = true;
         } else if moving.0 {

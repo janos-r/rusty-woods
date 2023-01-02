@@ -7,6 +7,8 @@
     - interior tiles
 - animation enhancements
   - add animation stages from ludum (animate while standing)
+    - animationState
+    - spriteSheetAnimation (with indices)
   - patrol
 
 ### Optional
