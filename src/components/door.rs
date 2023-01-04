@@ -1,4 +1,3 @@
-use super::*;
 use crate::*;
 use bevy_ecs_ldtk::utils::ldtk_pixel_coords_to_translation_pivoted;
 
@@ -33,7 +32,7 @@ pub struct DoorBundle {
     #[sprite_sheet_bundle]
     sprite_sheet_bundle: SpriteSheetBundle,
     collider: Collider,
-    #[with(with_collision_events)]
+    #[with(super::with_collision_events)]
     active_events: ActiveEvents,
     #[from_entity_instance]
     linked_door: DoorRef,

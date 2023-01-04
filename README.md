@@ -6,9 +6,6 @@
     - use doors on sprites
     - interior tiles
 - animation enhancements
-  - add animation stages from ludum (animate while standing)
-    - animationState
-    - spriteSheetAnimation (with indices)
   - patrol
 
 ### Optional
@@ -23,8 +20,8 @@ bevy game list\
 
 ### Sprite source
 
-- bevy assets
-- <https://game-endeavor.itch.io/mystic-woods>
+- player gabe - bevy assets
+- plains, trees, decor, fences, etc. <https://game-endeavor.itch.io/mystic-woods>
 
 ### Issues I found workarounds for
 

@@ -1,13 +1,26 @@
+pub mod animation;
 pub mod collision_events;
+pub use animation::*;
 pub use collision_events::*;
 
 use crate::*;
 
+// Systems - in this module, I keep systems that run on every tick.
+// Systems for spawning entities and theirs components I keep in components.
+
 pub fn move_player(
     keyboard_input: Res<Input<KeyCode>>,
-    mut query: Query<(&mut Velocity, &mut Moving, &mut TextureAtlasSprite), With<Player>>,
+    mut query: Query<
+        (
+            &mut Velocity,
+            &mut TextureAtlasSprite,
+            &mut PlayerAnimationState,
+            &mut SpriteSheetAnimation,
+        ),
+        With<Player>,
+    >,
 ) {
-    if let Ok((mut velocity, mut moving, mut sprite)) = query.get_single_mut() {
+    if let Ok((mut velocity, mut sprite, mut state, mut animation)) = query.get_single_mut() {
         const SPEED: f32 = 200.;
 
         let default = Vect::default();
@@ -30,12 +43,16 @@ pub fn move_player(
             velocity.linvel += Vect::new(0., -SPEED);
         }
 
-        // This keeps the animation running only while pressing the movement keys. Not from external forces like standing on corners.
-        // While pressing, every frame is considered as Changed<Moving>
         if velocity.linvel != default {
-            moving.0 = true;
-        } else if moving.0 {
-            moving.0 = false;
+            if *state != PlayerAnimationState::Running {
+                // start running
+                *state = PlayerAnimationState::Running;
+                *animation = PlayerAnimationState::Running.into();
+            }
+        } else if *state != PlayerAnimationState::Idle {
+            // stop running
+            *state = PlayerAnimationState::Idle;
+            *animation = PlayerAnimationState::Idle.into();
         }
     }
 }
@@ -56,29 +73,5 @@ pub fn move_camera(
         let mut camera_transform = camera_query.single_mut();
         camera_transform.translation.x = player_transform.translation.x;
         camera_transform.translation.y = player_transform.translation.y;
-    }
-}
-
-pub fn animate_player(
-    time: Res<Time>,
-    texture_atlases: Res<Assets<TextureAtlas>>,
-    mut query: Query<
-        (
-            &mut components::AnimationTimer,
-            &mut TextureAtlasSprite,
-            &Handle<TextureAtlas>,
-            &Moving,
-        ),
-        Changed<Moving>,
-    >,
-) {
-    if let Ok((mut timer, mut sprite, texture_atlas_handle, moving)) = query.get_single_mut() {
-        timer.tick(time.delta());
-        if !moving.0 {
-            sprite.index = 0;
-        } else if timer.finished() {
-            let texture_atlas = texture_atlases.get(texture_atlas_handle).unwrap();
-            sprite.index = (sprite.index + 1) % texture_atlas.textures.len();
-        }
     }
 }

@@ -7,18 +7,12 @@ pub use {door::*, player::*, sign::*, ui::*, wall::*};
 
 use crate::*;
 
-#[derive(Component, Default, Deref, DerefMut)]
-pub struct AnimationTimer(Timer);
+// Components - in this module, I keep only systems to spawn entities with their components.
+// Systems that run on every tick I keep in the systems module.
 
 /// Entity String ref from LDtk
 #[derive(Clone, Component, Debug, Default, Deref, DerefMut)]
 pub struct EntityIid(pub String);
-
-impl From<EntityInstance> for EntityIid {
-    fn from(entity_instance: EntityInstance) -> Self {
-        EntityIid(entity_instance.iid)
-    }
-}
 
 /// ←↑→↓
 #[derive(Component, Debug, Default)]

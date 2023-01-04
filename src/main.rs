@@ -38,7 +38,7 @@ fn main() {
         // ↓ Run
         .add_system(move_player)
         .add_system(move_camera)
-        .add_system(animate_player)
+        .add_system(animation)
         .add_system(player_derive_z_from_y)
         .add_system(collision_events)
         .run();
