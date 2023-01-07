@@ -22,19 +22,16 @@ pub struct SignBundle {
 
 impl From<EntityInstance> for SignText {
     fn from(entity_instance: EntityInstance) -> SignText {
-        if let Some(field_instance) = entity_instance
+        let Some(field_instance) = entity_instance
             .field_instances
             .iter()
-            .find(|f| f.identifier == "String")
-        {
-            if let FieldValue::String(Some(text)) = &field_instance.value {
-                SignText(text.to_owned())
-            } else {
-                default()
-            }
-        } else {
-            default()
-        }
+            .find(|f| f.identifier == "String") else {
+            return default();
+        };
+        let FieldValue::String(Some(text)) = &field_instance.value else {
+            return default();
+        };
+        SignText(text.to_owned())
     }
 }
 

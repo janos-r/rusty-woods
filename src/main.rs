@@ -51,6 +51,7 @@ impl Plugin for SpawnPlugin {
         app.register_ldtk_entity::<PlayerBundle>("EntityPlayer")
             .register_ldtk_entity::<SignBundle>("EntitySign")
             .register_ldtk_entity::<DoorBundle>("EntityDoor")
+            .register_ldtk_entity::<FrogBundle>("EntityFrog")
             .register_ldtk_int_cell::<WallBundle>(1)
             .add_system(spawn_player)
             .add_system(spawn_sign)

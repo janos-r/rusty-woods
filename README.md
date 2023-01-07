@@ -21,7 +21,8 @@ bevy game list\
 ### Sprite source
 
 - player gabe - bevy assets
-- plains, trees, decor, fences, etc. <https://game-endeavor.itch.io/mystic-woods>
+- plains(grass, dirt, higher ground), decor, fences, objects (trees, rocks, signs) <https://game-endeavor.itch.io/mystic-woods>
+- frog, houses <https://pixel-boy.itch.io/ninja-adventure-asset-pack>
 
 ### Issues I found workarounds for
 

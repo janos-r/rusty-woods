@@ -29,7 +29,10 @@ impl From<PlayerAnimationState> for SpriteSheetAnimation {
             PlayerAnimationState::Running => 1..7,
         };
         let timer = Timer::from_seconds(0.08, TimerMode::Repeating);
-        SpriteSheetAnimation { indices, timer }
+        SpriteSheetAnimation {
+            state_range: Some(indices),
+            timer,
+        }
     }
 }
 
@@ -39,6 +42,7 @@ pub fn spawn_player(mut commands: Commands, query_player: Query<Entity, Added<Pl
             .entity(player)
             .insert(RigidBody::Dynamic)
             .insert(LockedAxes::ROTATION_LOCKED)
+            .insert(SpriteSheetAnimation::from(PlayerAnimationState::Idle))
             // For now does nothing, but to be used if it would become usefull to track the facing direction of the player.
             // In case of a better sprite sheet or interaction with entities.
             .insert(super::Direction::Down)

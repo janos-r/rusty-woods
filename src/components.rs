@@ -1,9 +1,10 @@
 pub mod door;
+pub mod frog;
 pub mod player;
 pub mod sign;
 pub mod ui;
 pub mod wall;
-pub use {door::*, player::*, sign::*, ui::*, wall::*};
+pub use {door::*, frog::*, player::*, sign::*, ui::*, wall::*};
 
 use crate::*;
 
