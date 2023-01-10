@@ -28,7 +28,6 @@ impl Door {
 #[derive(Bundle, LdtkEntity)]
 pub struct DoorBundle {
     door: Door,
-    z_from_y: DeriveZFromY,
     #[sprite_sheet_bundle]
     sprite_sheet_bundle: SpriteSheetBundle,
     collider: Collider,
@@ -64,14 +63,13 @@ impl From<EntityInstance> for DoorRef {
 }
 
 pub fn spawn_door(
-    mut _commands: Commands,
     query_door: Query<(&EntityInstance, &super::Direction), Added<Door>>,
-    mut player_query: Query<(&EntityIid, &mut Transform), With<Player>>,
+    mut player_query: Query<(&EntityIid, &mut Transform, &DeriveZFromY), With<Player>>,
     level_query: Query<&Handle<LdtkLevel>>,
     levels: Res<Assets<LdtkLevel>>,
 ) {
     for (entity_instance, direction) in &query_door {
-        if let Ok((player_target_iid, mut player_transform)) = player_query.get_single_mut() {
+        if let Ok((player_target_iid, mut player_transform, dzfy)) = player_query.get_single_mut() {
             if player_target_iid.0 == entity_instance.iid {
                 for level_handle in &level_query {
                     let level_px_hei = levels
@@ -80,6 +78,7 @@ pub fn spawn_door(
                         .level
                         .px_hei;
                     let entity_size = IVec2::new(entity_instance.width, entity_instance.height);
+                    // TODO: try just loading the translation here instead
                     let door_location = ldtk_pixel_coords_to_translation_pivoted(
                         entity_instance.px,
                         level_px_hei,
@@ -91,7 +90,7 @@ pub fn spawn_door(
                     player_transform.translation = Vec3::new(
                         spawn_location.x,
                         spawn_location.y,
-                        DeriveZFromY::get(spawn_location.y),
+                        dzfy.get(spawn_location.y),
                     )
                 }
             }

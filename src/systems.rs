@@ -57,11 +57,11 @@ pub fn move_player(
     }
 }
 
-pub fn player_derive_z_from_y(
-    mut player_query: Query<&mut Transform, (Changed<Transform>, With<Player>)>,
+pub fn derive_z_from_y_after_move(
+    mut player_query: Query<(&mut Transform, &DeriveZFromY), Changed<Transform>>,
 ) {
-    if let Ok(mut transform) = player_query.get_single_mut() {
-        transform.translation.z = DeriveZFromY::get(transform.translation.y);
+    if let Ok((mut transform, dzfy)) = player_query.get_single_mut() {
+        transform.translation.z = dzfy.get(transform.translation.y);
     }
 }
 

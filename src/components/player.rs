@@ -14,6 +14,8 @@ pub struct PlayerBundle {
     #[worldly]
     worldly: Worldly,
     teleporting_to_entity_iid: EntityIid,
+    #[with(super::derive_z_from_y)]
+    z_from_y: DeriveZFromY,
 }
 
 #[derive(Debug, Eq, PartialEq, Component, Default)]
@@ -43,14 +45,14 @@ pub fn spawn_player(mut commands: Commands, query_player: Query<Entity, Added<Pl
             .insert(RigidBody::Dynamic)
             .insert(LockedAxes::ROTATION_LOCKED)
             .insert(SpriteSheetAnimation::from(PlayerAnimationState::Idle))
-            // For now does nothing, but to be used if it would become usefull to track the facing direction of the player.
+            // For now does nothing, but to be used if it would become useful to track the facing direction of the player.
             // In case of a better sprite sheet or interaction with entities.
             .insert(super::Direction::Down)
             // Position the collider relative to the rigid-body.
             .with_children(|parent| {
                 parent.spawn((
-                    TransformBundle::from(Transform::from_xyz(0., -8., 0.)),
-                    Collider::ball(8.),
+                    TransformBundle::from(Transform::from_xyz(0., -6., 0.)),
+                    Collider::ball(6.),
                     Friction::new(0.),
                 ));
             });

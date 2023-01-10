@@ -1,10 +1,11 @@
+pub mod buildings;
 pub mod door;
-pub mod frog;
+pub mod mobs;
 pub mod player;
 pub mod sign;
 pub mod ui;
 pub mod wall;
-pub use {door::*, frog::*, player::*, sign::*, ui::*, wall::*};
+pub use {buildings::*, door::*, mobs::*, player::*, sign::*, ui::*, wall::*};
 
 use crate::*;
 
@@ -51,7 +52,18 @@ fn with_collision_events(_: EntityInstance) -> ActiveEvents {
 }
 
 #[derive(Component, Default)]
-pub struct DeriveZFromY;
+pub struct DeriveZFromY {
+    // visual_base_of_image
+    px_below_center: f32,
+}
+
+impl From<i32> for DeriveZFromY {
+    fn from(value: i32) -> Self {
+        Self {
+            px_below_center: value as f32,
+        }
+    }
+}
 
 impl DeriveZFromY {
     /*
@@ -64,15 +76,20 @@ impl DeriveZFromY {
     */
     const MIRROR_BASE: f32 = 100.;
     const COEFFICIENT: f32 = 100.;
-    pub fn get(y: f32) -> f32 {
-        Self::MIRROR_BASE - y / Self::COEFFICIENT
+    pub fn get(&self, y: f32) -> f32 {
+        Self::MIRROR_BASE - (y - self.px_below_center) / Self::COEFFICIENT
     }
 }
 
-pub fn spawn_derive_z_from_y(
-    mut query: Query<&mut Transform, (Added<Transform>, With<DeriveZFromY>)>,
-) {
-    for mut transform in &mut query {
-        transform.translation.z = DeriveZFromY::get(transform.translation.y);
+// This "default" implementation works only if the sprite has its visual base exactly on the bottom of its tile.
+// Otherwise, if there is some padding on the bottom of the tile, implement this number individually for that bundle.
+// This way you can use many different sorts of tiles with or without padding (space around the sprite).
+fn derive_z_from_y(entity_instance: EntityInstance) -> DeriveZFromY {
+    (entity_instance.height / 2).into()
+}
+
+pub fn spawn_derive_z_from_y(mut query: Query<(&mut Transform, &DeriveZFromY), Added<Transform>>) {
+    for (mut transform, dzfy) in &mut query {
+        transform.translation.z = dzfy.get(transform.translation.y);
     }
 }

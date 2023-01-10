@@ -39,7 +39,7 @@ fn main() {
         .add_system(move_player)
         .add_system(move_camera)
         .add_system(animation)
-        .add_system(player_derive_z_from_y)
+        .add_system(derive_z_from_y_after_move)
         .add_system(collision_events)
         .run();
 }
@@ -48,14 +48,16 @@ struct SpawnPlugin;
 
 impl Plugin for SpawnPlugin {
     fn build(&self, app: &mut App) {
-        app.register_ldtk_entity::<PlayerBundle>("EntityPlayer")
-            .register_ldtk_entity::<SignBundle>("EntitySign")
-            .register_ldtk_entity::<DoorBundle>("EntityDoor")
-            .register_ldtk_entity::<FrogBundle>("EntityFrog")
-            .register_ldtk_int_cell::<WallBundle>(1)
+        app.register_ldtk_entity::<PlayerBundle>("Player")
+            .register_ldtk_entity::<SignBundle>("Sign")
+            .register_ldtk_entity::<DoorBundle>("Door")
+            .register_ldtk_entity::<FrogBundle>("Frog")
+            .register_ldtk_entity::<ToriiGateBundle>("ToriiGate")
+            .register_ldtk_int_cell::<WallBundle>(4)
             .add_system(spawn_player)
             .add_system(spawn_sign)
             .add_system(spawn_door)
+            .add_system(spawn_torii_gate)
             .add_system(spawn_wall_collision)
             .add_system(spawn_derive_z_from_y);
     }
@@ -72,7 +74,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn({
         Camera2dBundle {
             projection: OrthographicProjection {
-                scale: 0.5,
+                scale: 0.3,
                 ..default()
             },
             ..default()
@@ -81,7 +83,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     // Ldtk world
     commands.spawn(LdtkWorldBundle {
-        ldtk_handle: asset_server.load("LDtk/world1.ldtk"),
+        ldtk_handle: asset_server.load("LDtk/world2.ldtk"),
         ..default()
     });
 

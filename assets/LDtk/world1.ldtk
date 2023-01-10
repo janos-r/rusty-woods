@@ -147,7 +147,7 @@
 		}
 	], "entities": [
 		{
-			"identifier": "EntityPlayer",
+			"identifier": "Player",
 			"uid": 5,
 			"tags": [],
 			"width": 48,
@@ -201,7 +201,7 @@
 			"fieldDefs": []
 		},
 		{
-			"identifier": "EntitySign",
+			"identifier": "Sign",
 			"uid": 15,
 			"tags": [],
 			"width": 16,
@@ -288,7 +288,7 @@
 			"fieldDefs": []
 		},
 		{
-			"identifier": "EntityDoor",
+			"identifier": "Door",
 			"uid": 19,
 			"tags": [],
 			"width": 48,
@@ -380,7 +380,7 @@
 			]
 		},
 		{
-			"identifier": "EntityFrog",
+			"identifier": "Frog",
 			"uid": 33,
 			"tags": [],
 			"width": 40,
@@ -603,7 +603,7 @@
 					"gridTiles": [],
 					"entityInstances": [
 						{
-							"__identifier": "EntitySign",
+							"__identifier": "Sign",
 							"__grid": [14,9],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
@@ -622,7 +622,7 @@
 							}] }]
 						},
 						{
-							"__identifier": "EntitySign",
+							"__identifier": "Sign",
 							"__grid": [9,12],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
@@ -639,7 +639,7 @@
 							}] }]
 						},
 						{
-							"__identifier": "EntityDoor",
+							"__identifier": "Door",
 							"__grid": [21,18],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
@@ -655,7 +655,7 @@
 									"entityIid": "4618b090-7820-11ed-8a70-c9c419731504",
 									"layerIid": "cb1238d1-5110-11ed-b5f8-3d5549b1cdce",
 									"levelIid": "cb1238d0-5110-11ed-b5f8-774d9bde9a1c",
-									"worldIid": "3fcfe160-7820-11ed-84cb-3701ab640776"
+									"worldIid": "f42cf080-7820-11ed-8485-679b824b379a"
 								}, "__type": "EntityRef", "__tile": null, "defUid": 22, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["4618b090-7820-11ed-8a70-c9c419731504"]
@@ -667,7 +667,7 @@
 							]
 						},
 						{
-							"__identifier": "EntityPlayer",
+							"__identifier": "Player",
 							"__grid": [3,15],
 							"__pivot": [0.5,1],
 							"__tags": [],
@@ -681,7 +681,7 @@
 							"fieldInstances": []
 						},
 						{
-							"__identifier": "EntitySign",
+							"__identifier": "Sign",
 							"__grid": [7,19],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
@@ -695,7 +695,7 @@
 							"fieldInstances": [{ "__identifier": "String", "__value": null, "__type": "String", "__tile": null, "defUid": 17, "realEditorValues": [] }]
 						},
 						{
-							"__identifier": "EntityFrog",
+							"__identifier": "Frog",
 							"__grid": [4,10],
 							"__pivot": [0.5,1],
 							"__tags": [],
@@ -863,7 +863,7 @@
 					"gridTiles": [],
 					"entityInstances": [
 						{
-							"__identifier": "EntityDoor",
+							"__identifier": "Door",
 							"__grid": [2,13],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
@@ -879,7 +879,7 @@
 									"entityIid": "370792b0-7820-11ed-8a70-1b9d534a4b10",
 									"layerIid": "958fd950-5110-11ed-95cb-c9424ba5a7b9",
 									"levelIid": "f02e8880-2a00-11ed-ad8b-a33bae0ac0ba",
-									"worldIid": "3fcfe160-7820-11ed-84cb-3701ab640776"
+									"worldIid": "f42cf080-7820-11ed-8485-679b824b379a"
 								}, "__type": "EntityRef", "__tile": null, "defUid": 22, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["370792b0-7820-11ed-8a70-1b9d534a4b10"]
