@@ -21,7 +21,7 @@ pub fn move_player(
     >,
 ) {
     if let Ok((mut velocity, mut sprite, mut state, mut animation)) = query.get_single_mut() {
-        const SPEED: f32 = 200.;
+        const SPEED: f32 = 150.;
 
         let default = Vect::default();
         if velocity.linvel != default {

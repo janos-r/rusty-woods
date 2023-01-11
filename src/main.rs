@@ -52,8 +52,10 @@ impl Plugin for SpawnPlugin {
             .register_ldtk_entity::<SignBundle>("Sign")
             .register_ldtk_entity::<DoorBundle>("Door")
             .register_ldtk_entity::<FrogBundle>("Frog")
-            .register_ldtk_entity::<ToriiGateBundle>("ToriiGate")
-            .register_ldtk_int_cell::<WallBundle>(4)
+            .register_ldtk_entity::<HouseBundle>("House")
+            // .register_ldtk_entity::<ToriiGateBundle>("ToriiGate") // currently broken sprite - not implemented in editor
+            .register_ldtk_int_cell::<WallBundle>(4) // higher ground
+            .register_ldtk_int_cell::<WallBundle>(10) // invisible walls
             .add_system(spawn_player)
             .add_system(spawn_sign)
             .add_system(spawn_door)

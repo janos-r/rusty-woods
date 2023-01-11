@@ -2,6 +2,9 @@ use crate::*;
 
 #[derive(Component, Default)]
 pub struct Player;
+impl Player {
+    pub const SHIFT_COLLIDER: f32 = 6.;
+}
 
 #[derive(Bundle, LdtkEntity)]
 pub struct PlayerBundle {
@@ -51,7 +54,7 @@ pub fn spawn_player(mut commands: Commands, query_player: Query<Entity, Added<Pl
             // Position the collider relative to the rigid-body.
             .with_children(|parent| {
                 parent.spawn((
-                    TransformBundle::from(Transform::from_xyz(0., -6., 0.)),
+                    TransformBundle::from(Transform::from_xyz(0., -Player::SHIFT_COLLIDER, 0.)),
                     Collider::ball(6.),
                     Friction::new(0.),
                 ));

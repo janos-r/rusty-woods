@@ -30,3 +30,11 @@ pub fn spawn_torii_gate(mut commands: Commands, query: Query<Entity, Added<Torii
         });
     }
 }
+
+#[derive(Bundle, LdtkEntity)]
+pub struct HouseBundle {
+    #[with(super::derive_z_from_y)]
+    z_from_y: DeriveZFromY,
+    #[sprite_sheet_bundle]
+    sprite_sheet_bundle: SpriteSheetBundle,
+}

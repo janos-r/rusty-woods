@@ -1,9 +1,8 @@
 ### TODOs
 
 - add new free sprite sheet
-  - use signs and walls on new map
+  - redo Objects-set as entities
   - add houses
-    - use doors on sprites
     - interior tiles
 - animation enhancements
   - patrol
@@ -34,3 +33,11 @@ To look for real fixes in the future, if someone is looking to build upon this c
 - Accessing entity_refs outside the current level
   - bevy_ecs_ldtk issue - see in `door.rs` under "Known issue"
   <https://github.com/Trouv/bevy_ecs_ldtk/discussions/113>
+
+- Sprite selection from multiple tiles loads the wrong tiles
+  - bevy_ecs_ldtk issue - not possible to use `torii_gate` see ToriiGateBundle
+  <https://github.com/Trouv/bevy_ecs_ldtk/issues/151>
+
+- Rules based tiles don't use pivot
+  - bevy_ecs_ldtk issue - some ground objects had to be remade as entities
+  <https://github.com/Trouv/bevy_ecs_ldtk/issues/152>
