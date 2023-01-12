@@ -3,7 +3,7 @@ use crate::*;
 #[derive(Component, Default)]
 pub struct ToriiGate;
 impl ToriiGate {
-    const PILLAR_SIZE: f32 = 3.;
+    const PILLAR_SIZE: f32 = 2.5;
 }
 
 #[derive(Bundle, LdtkEntity)]
@@ -20,11 +20,11 @@ pub fn spawn_torii_gate(mut commands: Commands, query: Query<Entity, Added<Torii
         commands.entity(entity).with_children(|parent| {
             // Spawn two colliders (pillars) relative to the rigid-body.
             parent.spawn((
-                TransformBundle::from(Transform::from_xyz(-16., -16., 0.)),
+                TransformBundle::from(Transform::from_xyz(-11., -12., 0.)),
                 Collider::ball(ToriiGate::PILLAR_SIZE),
             ));
             parent.spawn((
-                TransformBundle::from(Transform::from_xyz(16., -16., 0.)),
+                TransformBundle::from(Transform::from_xyz(11., -12., 0.)),
                 Collider::ball(ToriiGate::PILLAR_SIZE),
             ));
         });

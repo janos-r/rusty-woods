@@ -1,7 +1,6 @@
 ### TODOs
 
 - add new free sprite sheet
-  - redo Objects-set as entities
   - add houses
     - interior tiles
 - animation enhancements
@@ -35,9 +34,11 @@ To look for real fixes in the future, if someone is looking to build upon this c
   <https://github.com/Trouv/bevy_ecs_ldtk/discussions/113>
 
 - Sprite selection from multiple tiles loads the wrong tiles
-  - bevy_ecs_ldtk issue - not possible to use `torii_gate` see ToriiGateBundle
+  - bevy_ecs_ldtk issue
+  - workaround: multi-tile sprites have to be cut out from sprite sheets into their own sheet - see `toriiGate.png` from `TilesetHouse.png` or `treeBig.png` from `objects.png`
   <https://github.com/Trouv/bevy_ecs_ldtk/issues/151>
 
 - Rules based tiles don't use pivot
-  - bevy_ecs_ldtk issue - some ground objects had to be remade as entities
+  - bevy_ecs_ldtk issue
+  - workaround: some ground objects had to be remade as entities
   <https://github.com/Trouv/bevy_ecs_ldtk/issues/152>

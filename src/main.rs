@@ -53,13 +53,20 @@ impl Plugin for SpawnPlugin {
             .register_ldtk_entity::<DoorBundle>("Door")
             .register_ldtk_entity::<FrogBundle>("Frog")
             .register_ldtk_entity::<HouseBundle>("House")
-            // .register_ldtk_entity::<ToriiGateBundle>("ToriiGate") // currently broken sprite - not implemented in editor
+            .register_ldtk_entity::<ToriiGateBundle>("ToriiGate")
+            .register_ldtk_entity::<TreeBigBundle>("TreeBig")
+            .register_ldtk_entity::<TreeSmallBundle>("TreeSmall")
             .register_ldtk_int_cell::<WallBundle>(4) // higher ground
-            .register_ldtk_int_cell::<WallBundle>(10) // invisible walls
+            .register_ldtk_int_cell::<WallBundle>(5) // fences
+            .register_ldtk_int_cell::<WallBundle>(6) // thick trees
+            .register_ldtk_int_cell::<WallBundle>(8) // rocks
+            .register_ldtk_int_cell::<WallBundle>(9) // invisible walls
             .add_system(spawn_player)
             .add_system(spawn_sign)
             .add_system(spawn_door)
             .add_system(spawn_torii_gate)
+            .add_system(spawn_tree_big)
+            .add_system(spawn_tree_small)
             .add_system(spawn_wall_collision)
             .add_system(spawn_derive_z_from_y);
     }

@@ -1,11 +1,7 @@
 use crate::*;
 
-#[derive(Component, Default)]
-pub struct Frog;
-
 #[derive(Bundle, LdtkEntity)]
 pub struct FrogBundle {
-    frog: Frog,
     #[with(derive_z_from_y)]
     z_from_y: DeriveZFromY,
     #[sprite_sheet_bundle]
@@ -15,10 +11,10 @@ pub struct FrogBundle {
     collider: Collider,
 }
 
-fn collider(_: EntityInstance) -> Collider {
-    Collider::ball(12.)
-}
-
 fn derive_z_from_y(_: EntityInstance) -> DeriveZFromY {
     12.into()
+}
+
+fn collider(_: EntityInstance) -> Collider {
+    Collider::ball(12.)
 }

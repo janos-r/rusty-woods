@@ -3,8 +3,8 @@ use crate::*;
 #[derive(Component, Default)]
 pub struct Sign;
 
+// so that it can be located relative to the sign, and have ActiveEvents
 #[derive(Component, Default)]
-// separate entity - so that it can be located relative to the sign
 pub struct SignCollider;
 
 #[derive(Component, Default)]
@@ -36,9 +36,9 @@ impl From<EntityInstance> for SignText {
     }
 }
 
-pub fn spawn_sign(mut commands: Commands, query_sign: Query<Entity, Added<Sign>>) {
-    for sign in &query_sign {
-        commands.entity(sign).with_children(|parent| {
+pub fn spawn_sign(mut commands: Commands, query: Query<Entity, Added<Sign>>) {
+    for entity in &query {
+        commands.entity(entity).with_children(|parent| {
             parent.spawn((
                 SignCollider,
                 // Position the collider relative to the rigid-body.

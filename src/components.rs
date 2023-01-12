@@ -3,9 +3,10 @@ pub mod door;
 pub mod mobs;
 pub mod player;
 pub mod sign;
+pub mod trees;
 pub mod ui;
 pub mod wall;
-pub use {buildings::*, door::*, mobs::*, player::*, sign::*, ui::*, wall::*};
+pub use {buildings::*, door::*, mobs::*, player::*, sign::*, trees::*, ui::*, wall::*};
 
 use crate::*;
 
