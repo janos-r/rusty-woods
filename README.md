@@ -1,8 +1,5 @@
 ### TODOs
 
-- add new free sprite sheet
-  - add houses
-    - interior tiles
 - animation enhancements
   - patrol
 

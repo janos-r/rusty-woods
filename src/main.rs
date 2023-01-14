@@ -61,6 +61,7 @@ impl Plugin for SpawnPlugin {
             .register_ldtk_int_cell::<WallBundle>(6) // thick trees
             .register_ldtk_int_cell::<WallBundle>(8) // rocks
             .register_ldtk_int_cell::<WallBundle>(9) // invisible walls
+            .register_ldtk_int_cell::<WallBundle>(10) // interior walls
             .add_system(spawn_player)
             .add_system(spawn_sign)
             .add_system(spawn_door)
@@ -96,6 +97,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         ..default()
     });
 
+    /*
     // Test sprites
     commands
         .spawn(MySpriteBundle {
@@ -130,4 +132,5 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         },
         collider: Collider::cuboid(25.0, 100.0),
     });
+    */
 }
