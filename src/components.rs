@@ -58,14 +58,6 @@ pub struct DeriveZFromY {
     px_below_center: f32,
 }
 
-impl From<i32> for DeriveZFromY {
-    fn from(value: i32) -> Self {
-        Self {
-            px_below_center: value as f32,
-        }
-    }
-}
-
 impl DeriveZFromY {
     /*
     The default camera is on Z 1000, lets keep that.
@@ -80,17 +72,27 @@ impl DeriveZFromY {
     pub fn get(&self, y: f32) -> f32 {
         Self::MIRROR_BASE - (y - self.px_below_center) / Self::COEFFICIENT
     }
+
+    pub fn spawn(mut query: Query<(&mut Transform, &DeriveZFromY), Added<DeriveZFromY>>) {
+        for (mut transform, dzfy) in &mut query {
+            transform.translation.z = dzfy.get(transform.translation.y);
+        }
+    }
+}
+
+impl From<i32> for DeriveZFromY {
+    fn from(value: i32) -> Self {
+        Self {
+            px_below_center: value as f32,
+        }
+    }
 }
 
 // This "default" implementation works only if the sprite has its visual base exactly on the bottom of its tile.
 // Otherwise, if there is some padding on the bottom of the tile, implement this number individually for that bundle.
 // This way you can use many different sorts of tiles with or without padding (space around the sprite).
-fn derive_z_from_y(entity_instance: EntityInstance) -> DeriveZFromY {
-    (entity_instance.height / 2).into()
-}
-
-pub fn spawn_derive_z_from_y(mut query: Query<(&mut Transform, &DeriveZFromY), Added<Transform>>) {
-    for (mut transform, dzfy) in &mut query {
-        transform.translation.z = dzfy.get(transform.translation.y);
+impl From<EntityInstance> for DeriveZFromY {
+    fn from(entity_instance: EntityInstance) -> Self {
+        (entity_instance.height / 2).into()
     }
 }

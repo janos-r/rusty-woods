@@ -4,6 +4,10 @@ name = "bevy-test"
 version = "0.1.0"
 
 [dependencies]
-bevy = { version = "0.9", features = ["dynamic"] }
+# This makes builds for development much faster!
+# NOTE from official docs:
+# Remember to revert this before releasing your game! Otherwise you will need to include libbevy_dylib alongside your game if you want it to run. If you remove the "dynamic" feature, your game executable can run standalone.
+# bevy = { version = "0.9", features = ["dynamic"] }
+bevy = { version = "0.9"}
 bevy_ecs_ldtk = "0.5"
 bevy_rapier2d = "0.19"

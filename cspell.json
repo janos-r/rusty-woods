@@ -1,4 +1,5 @@
-// run with: cspell "*.md" "src/**"
+// run: cspell "*.md" "src/**"
+// add all words as exceptions: cspell "*.md" "src/**" --words-only --unique >> cspell-words.txt
 {
   "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
   "version": "0.2",

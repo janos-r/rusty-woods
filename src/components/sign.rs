@@ -3,6 +3,22 @@ use crate::*;
 #[derive(Component, Default)]
 pub struct Sign;
 
+impl Sign {
+    pub fn spawn(mut commands: Commands, query: Query<Entity, Added<Sign>>) {
+        for entity in &query {
+            commands.entity(entity).with_children(|parent| {
+                parent.spawn((
+                    SignCollider,
+                    // Position the collider relative to the rigid-body.
+                    TransformBundle::from(Transform::from_xyz(0., -2., 0.)),
+                    Collider::ball(6.),
+                    ActiveEvents::COLLISION_EVENTS,
+                ));
+            });
+        }
+    }
+}
+
 // so that it can be located relative to the sign, and have ActiveEvents
 #[derive(Component, Default)]
 pub struct SignCollider;
@@ -13,7 +29,7 @@ pub struct SignText(pub String);
 #[derive(Bundle, LdtkEntity)]
 pub struct SignBundle {
     sign: Sign,
-    #[with(super::derive_z_from_y)]
+    #[from_entity_instance]
     z_from_y: DeriveZFromY,
     #[sprite_sheet_bundle]
     sprite_sheet_bundle: SpriteSheetBundle,
@@ -33,19 +49,5 @@ impl From<EntityInstance> for SignText {
             return default();
         };
         SignText(text.to_owned())
-    }
-}
-
-pub fn spawn_sign(mut commands: Commands, query: Query<Entity, Added<Sign>>) {
-    for entity in &query {
-        commands.entity(entity).with_children(|parent| {
-            parent.spawn((
-                SignCollider,
-                // Position the collider relative to the rigid-body.
-                TransformBundle::from(Transform::from_xyz(0., -2., 0.)),
-                Collider::ball(6.),
-                ActiveEvents::COLLISION_EVENTS,
-            ));
-        });
     }
 }

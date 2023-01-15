@@ -5,12 +5,31 @@ pub struct Door;
 
 impl Door {
     const SPAWN_DISTANCE: f32 = 10.;
+
     fn spawn_offset(direction: &super::Direction) -> Vec2 {
         match direction {
             super::Direction::Up => Vec2::new(0., Self::SPAWN_DISTANCE + Player::SHIFT_COLLIDER),
             super::Direction::Right => Vec2::new(Self::SPAWN_DISTANCE, 0.),
             super::Direction::Down => Vec2::new(0., -Self::SPAWN_DISTANCE),
             super::Direction::Left => Vec2::new(-Self::SPAWN_DISTANCE, 0.),
+        }
+    }
+
+    #[allow(clippy::type_complexity)]
+    pub fn spawn(
+        query_door: Query<(&EntityInstance, &super::Direction, &Transform), Added<Door>>,
+        mut player_query: Query<(&EntityIid, &mut Transform), (With<Player>, Without<Door>)>,
+    ) {
+        for (entity_instance, direction, door_transform) in &query_door {
+            if let Ok((player_target_iid, mut player_transform)) = player_query.get_single_mut() {
+                if player_target_iid.0 == entity_instance.iid {
+                    // spawn player close from the door, not on top
+                    let offset = Door::spawn_offset(direction);
+                    player_transform.translation.x = door_transform.translation.x + offset.x;
+                    player_transform.translation.y = door_transform.translation.y + offset.y;
+                    player_transform.translation.z = door_transform.translation.z;
+                }
+            }
         }
     }
 }
@@ -55,24 +74,6 @@ impl From<EntityInstance> for DoorRef {
             // Discussed in: https://github.com/Trouv/bevy_ecs_ldtk/discussions/113
             target_entity_iid: EntityIid(entity_ref.entity_iid.clone()),
             target_level_iid: LevelSelection::Iid(entity_ref.level_iid.clone()),
-        }
-    }
-}
-
-#[allow(clippy::type_complexity)]
-pub fn spawn_door(
-    query_door: Query<(&EntityInstance, &super::Direction, &Transform), Added<Door>>,
-    mut player_query: Query<(&EntityIid, &mut Transform), (With<Player>, Without<Door>)>,
-) {
-    for (entity_instance, direction, door_transform) in &query_door {
-        if let Ok((player_target_iid, mut player_transform)) = player_query.get_single_mut() {
-            if player_target_iid.0 == entity_instance.iid {
-                // spawn player close from the door, not on top
-                let offset = Door::spawn_offset(direction);
-                player_transform.translation.x = door_transform.translation.x + offset.x;
-                player_transform.translation.y = door_transform.translation.y + offset.y;
-                player_transform.translation.z = door_transform.translation.z;
-            }
         }
     }
 }
