@@ -28,19 +28,19 @@ pub fn move_player(
             velocity.linvel = default;
         }
 
-        if keyboard_input.pressed(KeyCode::Left) {
+        if keyboard_input.pressed(KeyCode::Up) || keyboard_input.pressed(KeyCode::W) {
+            velocity.linvel += Vect::new(0., SPEED);
+        }
+        if keyboard_input.pressed(KeyCode::Left) || keyboard_input.pressed(KeyCode::A) {
             velocity.linvel += Vect::new(-SPEED, 0.);
             sprite.flip_x = true;
         }
-        if keyboard_input.pressed(KeyCode::Right) {
+        if keyboard_input.pressed(KeyCode::Down) || keyboard_input.pressed(KeyCode::S) {
+            velocity.linvel += Vect::new(0., -SPEED);
+        }
+        if keyboard_input.pressed(KeyCode::Right) || keyboard_input.pressed(KeyCode::D) {
             velocity.linvel += Vect::new(SPEED, 0.);
             sprite.flip_x = false;
-        }
-        if keyboard_input.pressed(KeyCode::Up) {
-            velocity.linvel += Vect::new(0., SPEED);
-        }
-        if keyboard_input.pressed(KeyCode::Down) {
-            velocity.linvel += Vect::new(0., -SPEED);
         }
 
         if velocity.linvel != default {

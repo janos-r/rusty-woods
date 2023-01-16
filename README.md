@@ -1,3 +1,35 @@
+## Usage
+
+### Run
+
+```
+cargo run
+```
+
+Optional `--release`
+
+It might be necessary to install some system dependencies for bevy on your OS. See `/workflows/rust-ci.yml` for linux.
+
+### Wasm
+
+```
+trunk serve
+```
+
+Optional `--release`
+
+This should run as is after you install trunk.
+
+### Spellcheck
+
+```
+cspell "*.md" "src/**"
+```
+
+Because I talk allot.
+
+## Notes
+
 ### TODOs
 
 - animation enhancements
@@ -7,8 +39,8 @@
 
 - interaction with something in front
 - save_game
-    found a good example at:
-    <https://github.com/bevyengine/bevy/issues/1442>
+  found a good example at:
+  <https://github.com/bevyengine/bevy/issues/1442>
 
 bevy game list\
 <https://itch.io/search?q=bevy>
@@ -24,18 +56,24 @@ bevy game list\
 To look for real fixes in the future, if someone is looking to build upon this code
 
 - UI wrapping text
-  - Bevy issue - see in `ui.rs` under "Known issue" <https://github.com/bevyengine/bevy/issues/1490>
+
+  - Bevy issue
+  - see in `ui.rs` under "Known issue"
+  - <https://github.com/bevyengine/bevy/issues/1490>
 
 - Accessing entity_refs outside the current level
-  - bevy_ecs_ldtk issue - see in `door.rs` under "Known issue"
-  <https://github.com/Trouv/bevy_ecs_ldtk/discussions/113>
+
+  - bevy_ecs_ldtk issue
+  - see in `door.rs` under "Known issue"
+  - <https://github.com/Trouv/bevy_ecs_ldtk/discussions/113>
 
 - Sprite selection from multiple tiles loads the wrong tiles
+
   - bevy_ecs_ldtk issue
   - workaround: multi-tile sprites have to be cut out from sprite sheets into their own sheet - see `toriiGate.png` from `TilesetHouse.png` or `treeBig.png` from `objects.png`
-  <https://github.com/Trouv/bevy_ecs_ldtk/issues/151>
+  - <https://github.com/Trouv/bevy_ecs_ldtk/issues/151>
 
 - Rules based tiles don't use pivot
   - bevy_ecs_ldtk issue
   - workaround: some ground objects had to be remade as entities
-  <https://github.com/Trouv/bevy_ecs_ldtk/issues/152>
+  - <https://github.com/Trouv/bevy_ecs_ldtk/issues/152>
