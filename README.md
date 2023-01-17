@@ -1,3 +1,15 @@
+<p align="center">
+    <img src="assets/featured.png"/>
+</p>
+
+## [🚀️ Running example on my web](https://radim.xyz/rusty_woods/)
+
+## [📜️ Article on my web](https://radim.xyz/project/rusty_woods/)
+
+# Rusty Woods
+
+A 2D RPG-like groundwork with Bevy and LDtk.
+
 ## Usage
 
 ### Run
@@ -28,9 +40,9 @@ cspell "*.md" "src/**"
 
 Because I talk allot.
 
-## Notes
+# Notes
 
-### TODOs
+## TODOs
 
 - animation enhancements
   - patrol
@@ -45,15 +57,18 @@ Because I talk allot.
 bevy game list\
 <https://itch.io/search?q=bevy>
 
-### Sprite source
+## Sprite source
 
 - player gabe - bevy assets
-- plains(grass, dirt, higher ground), decor, fences, objects (trees, rocks, signs) <https://game-endeavor.itch.io/mystic-woods>
-- frog, houses <https://pixel-boy.itch.io/ninja-adventure-asset-pack>
+- plains (grass, dirt, higher ground), decor, fences, objects (trees, rocks, signs)
+  - <https://game-endeavor.itch.io/mystic-woods>
+- frog, houses
+  - <https://pixel-boy.itch.io/ninja-adventure-asset-pack>
+  - This is an amazing asset source. It is full of many free animated sprites and tileSets. I highly encourage to use it when playing with this.
 
-### Issues I found workarounds for
+## Issues I found workarounds for
 
-To look for real fixes in the future, if someone is looking to build upon this code
+To look for real fixes in the future, if someone is looking to build upon this code.
 
 - UI wrapping text
 
