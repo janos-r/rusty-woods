@@ -20,7 +20,8 @@ cargo run
 
 Optional `--release`
 
-It might be necessary to install some system dependencies for bevy on your OS. See `/workflows/rust-ci.yml` for linux.
+It might be necessary to install some system dependencies for bevy on your OS.
+See `/workflows/rust-ci.yml` for linux.
 
 ### Wasm
 
@@ -50,8 +51,7 @@ Because I talk allot.
 ### Optional
 
 - interaction with something in front
-- save_game
-  found a good example at:
+- save_game found a good example at:
   <https://github.com/bevyengine/bevy/issues/1442>
 
 bevy game list\
@@ -60,21 +60,26 @@ bevy game list\
 ## Sprite source
 
 - player gabe - bevy assets
-- plains (grass, dirt, higher ground), decor, fences, objects (trees, rocks, signs)
+- plains (grass, dirt, higher ground), decor, fences, objects (trees, rocks,
+  signs)
   - <https://game-endeavor.itch.io/mystic-woods>
 - frog, houses
   - <https://pixel-boy.itch.io/ninja-adventure-asset-pack>
-  - This is an amazing asset source. It is full of many free animated sprites and tileSets. I highly encourage to use it when playing with this.
+  - This is an amazing asset source. It is full of many free animated sprites
+    and tileSets. I highly encourage to use it when playing with this.
 
 ## Issues I found workarounds for
 
-To look for real fixes in the future, if someone is looking to build upon this code.
+To look for real fixes in the future, if someone is looking to build upon this
+code.
 
 - UI wrapping text
 
   - Bevy issue
   - see in `ui.rs` under "Known issue"
   - <https://github.com/bevyengine/bevy/issues/1490>
+  - Version [0.11](https://bevyengine.org/news/bevy-0-11/) claims to have solved
+    this
 
 - Accessing entity_refs outside the current level
 
@@ -85,7 +90,9 @@ To look for real fixes in the future, if someone is looking to build upon this c
 - Sprite selection from multiple tiles loads the wrong tiles
 
   - bevy_ecs_ldtk issue
-  - workaround: multi-tile sprites have to be cut out from sprite sheets into their own sheet - see `toriiGate.png` from `TilesetHouse.png` or `treeBig.png` from `objects.png`
+  - workaround: multi-tile sprites have to be cut out from sprite sheets into
+    their own sheet - see `toriiGate.png` from `TilesetHouse.png` or
+    `treeBig.png` from `objects.png`
   - <https://github.com/Trouv/bevy_ecs_ldtk/issues/151>
 
 - Rules based tiles don't use pivot
