@@ -41,9 +41,9 @@ pub fn collision_events(
                             commands.entity(*child).despawn_recursive();
                         }
                         // open text_box
-                        text_box_visibility.single_mut().is_visible = true;
+                        *text_box_visibility.single_mut() = Visibility::Inherited;
                         // new text
-                        commands.entity(entity).add_children(spawn_children_text(
+                        commands.entity(entity).with_children(spawn_children_text(
                             font_handle.clone(),
                             text.0.to_owned(),
                         ));
@@ -55,7 +55,7 @@ pub fn collision_events(
             for entity in [e1, e2] {
                 if sign_collider_query.contains(*entity) {
                     // close text_box
-                    text_box_visibility.single_mut().is_visible = false;
+                    *text_box_visibility.single_mut() = Visibility::Hidden;
                     break;
                 }
             }

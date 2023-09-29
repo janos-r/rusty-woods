@@ -27,12 +27,13 @@ pub enum Direction {
     Left,
 }
 
-impl From<EntityInstance> for Direction {
-    fn from(entity_instance: EntityInstance) -> Self {
+impl From<&EntityInstance> for Direction {
+    fn from(entity_instance: &EntityInstance) -> Self {
         let Some(field_instance) = entity_instance
             .field_instances
             .iter()
-            .find(|f| f.identifier == "Direction") else {
+            .find(|f| f.identifier == "Direction")
+        else {
             return default();
         };
         let FieldValue::Enum(Some(spawn_direction)) = &field_instance.value else {
@@ -48,7 +49,7 @@ impl From<EntityInstance> for Direction {
     }
 }
 
-fn with_collision_events(_: EntityInstance) -> ActiveEvents {
+fn with_collision_events(_: &EntityInstance) -> ActiveEvents {
     ActiveEvents::COLLISION_EVENTS
 }
 
@@ -89,10 +90,10 @@ impl From<i32> for DeriveZFromY {
 }
 
 // This "default" implementation works only if the sprite has its visual base exactly on the bottom of its tile.
-// Otherwise, if there is some padding on the bottom of the tile, implement this number individually for that bundle.
+// Otherwise, if there is some padding on the bottom of the tile, implement this number individually for that bundle. For example FrogBundle.
 // This way you can use many different sorts of tiles with or without padding (space around the sprite).
-impl From<EntityInstance> for DeriveZFromY {
-    fn from(entity_instance: EntityInstance) -> Self {
+impl From<&EntityInstance> for DeriveZFromY {
+    fn from(entity_instance: &EntityInstance) -> Self {
         (entity_instance.height / 2).into()
     }
 }

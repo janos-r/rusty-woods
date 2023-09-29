@@ -57,12 +57,13 @@ pub struct DoorRef {
     pub target_entity_iid: EntityIid,
 }
 
-impl From<EntityInstance> for DoorRef {
-    fn from(entity_instance: EntityInstance) -> Self {
+impl From<&EntityInstance> for DoorRef {
+    fn from(entity_instance: &EntityInstance) -> Self {
         let Some(field_instance) = entity_instance
             .field_instances
             .iter()
-            .find(|f| f.identifier == "Entity_ref") else {
+            .find(|f| f.identifier == "Entity_ref")
+        else {
             return default();
         };
         let FieldValue::EntityRef(Some(entity_ref)) = &field_instance.value else {

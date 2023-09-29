@@ -49,9 +49,9 @@ pub fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..default()
         },
         // transparent container
-        background_color: Color::rgba(0.65, 0.65, 0.65, 0.).into(),
+        background_color: Color::rgba(0., 0., 0., 0.).into(),
         // Debug - comment out invisibility on initial creation of the box to see it
-        visibility: Visibility::INVISIBLE,
+        visibility: Visibility::Hidden,
         ..default()
     })
     .insert(TextBoxContainer)

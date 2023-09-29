@@ -37,12 +37,13 @@ pub struct SignBundle {
     text: SignText,
 }
 
-impl From<EntityInstance> for SignText {
-    fn from(entity_instance: EntityInstance) -> SignText {
+impl From<&EntityInstance> for SignText {
+    fn from(entity_instance: &EntityInstance) -> SignText {
         let Some(field_instance) = entity_instance
             .field_instances
             .iter()
-            .find(|f| f.identifier == "String") else {
+            .find(|f| f.identifier == "String")
+        else {
             return default();
         };
         let FieldValue::String(Some(text)) = &field_instance.value else {

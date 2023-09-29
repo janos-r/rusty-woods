@@ -11,10 +11,10 @@ pub struct FrogBundle {
     collider: Collider,
 }
 
-fn derive_z_from_y(_: EntityInstance) -> DeriveZFromY {
+fn derive_z_from_y(_: &EntityInstance) -> DeriveZFromY {
     12.into()
 }
 
-fn collider(_: EntityInstance) -> Collider {
+fn collider(_: &EntityInstance) -> Collider {
     Collider::ball(12.)
 }
