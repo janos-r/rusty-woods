@@ -22,7 +22,7 @@ impl Door {
     ) {
         for (entity_instance, direction, door_transform) in &query_door {
             if let Ok((player_target_iid, mut player_transform)) = player_query.get_single_mut() {
-                if player_target_iid.0 == entity_instance.iid {
+                if player_target_iid.as_str() == entity_instance.iid {
                     // spawn player close from the door, not on top
                     let offset = Door::spawn_offset(direction);
                     player_transform.translation.x = door_transform.translation.x + offset.x;
@@ -73,7 +73,7 @@ impl From<&EntityInstance> for DoorRef {
             // Known issue: It has to be this complicated, because I don't know if there is a way to fetch the target Point here.
             // The target (and its Point) spawns only after its level spawns.
             // Discussed in: https://github.com/Trouv/bevy_ecs_ldtk/discussions/113
-            target_entity_iid: EntityIid(entity_ref.entity_iid.clone()),
+            target_entity_iid: EntityIid::new(entity_ref.entity_iid.clone()),
             target_level_iid: LevelSelection::Iid(entity_ref.level_iid.clone()),
         }
     }

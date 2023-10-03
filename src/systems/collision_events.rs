@@ -10,7 +10,7 @@ pub fn collision_events(
     // ↓ Signs
     sign_collider_query: Query<&Parent, With<SignCollider>>,
     sign_query: Query<&SignText>,
-    text_box_query: Query<(Entity, &Children, &Handle<Font>), With<TextBox>>,
+    text_box_query: Query<(Entity, &Handle<Font>), With<TextBox>>,
     mut commands: Commands,
     mut text_box_visibility: Query<&mut Visibility, With<TextBoxContainer>>,
 ) {
@@ -32,14 +32,8 @@ pub fn collision_events(
                 } else if let Ok(parent) = sign_collider_query.get(*entity) {
                     // Sign - display text
                     if let Ok(text) = sign_query.get(parent.get()) {
-                        // clear text
-                        // despawning children (here the words)
-                        // issue: https://bevy-cheatbook.github.io/features/parent-child.html?highlight=remove_chil#despawning-child-entities
-                        let (entity, children, font_handle) = text_box_query.single();
-                        commands.entity(entity).remove_children(children);
-                        for child in children {
-                            commands.entity(*child).despawn_recursive();
-                        }
+                        let (entity, font_handle) = text_box_query.single();
+                        commands.entity(entity).despawn_descendants();
                         // open text_box
                         *text_box_visibility.single_mut() = Visibility::Inherited;
                         // new text

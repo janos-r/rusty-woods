@@ -49,6 +49,6 @@ impl From<&EntityInstance> for SignText {
         let FieldValue::String(Some(text)) = &field_instance.value else {
             return default();
         };
-        SignText(text.to_owned())
+        SignText(text.clone())
     }
 }

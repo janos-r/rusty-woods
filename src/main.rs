@@ -26,21 +26,25 @@ fn main() {
             gravity: Vec2::ZERO,
             ..default()
         })
-        .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
+        .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())
         // .add_plugin(RapierDebugRenderPlugin::default()) // draws borders around colliders
         // ↓ LDtk
-        .add_plugin(LdtkPlugin)
+        .add_plugins(LdtkPlugin)
         .insert_resource(LevelSelection::Index(0))
         // ↓ Setup
-        .add_startup_system(setup)
-        .add_startup_system(setup_ui)
-        .add_plugin(SpawnPlugin)
+        .add_systems(Startup, (setup, setup_ui))
+        .add_plugins(SpawnPlugin)
         // ↓ Run
-        .add_system(move_player)
-        .add_system(move_camera)
-        .add_system(animation)
-        .add_system(derive_z_from_y_after_move)
-        .add_system(collision_events)
+        .add_systems(
+            Update,
+            (
+                move_player,
+                move_camera,
+                animation,
+                derive_z_from_y_after_move,
+                collision_events,
+            ),
+        )
         .run();
 }
 
@@ -62,27 +66,26 @@ impl Plugin for SpawnPlugin {
             .register_ldtk_int_cell::<WallBundle>(8) // rocks
             .register_ldtk_int_cell::<WallBundle>(9) // invisible walls
             .register_ldtk_int_cell::<WallBundle>(10) // interior walls
-            .add_system(Player::spawn)
-            .add_system(Sign::spawn)
-            .add_system(Door::spawn)
-            .add_system(ToriiGate::spawn)
-            .add_system(TreeBig::spawn)
-            .add_system(TreeSmall::spawn)
-            .add_system(Wall::spawn)
-            .add_system(DeriveZFromY::spawn);
+            .add_systems(Update, Player::spawn)
+            .add_systems(Update, Sign::spawn)
+            .add_systems(Update, Door::spawn)
+            .add_systems(Update, ToriiGate::spawn)
+            .add_systems(Update, TreeBig::spawn)
+            .add_systems(Update, TreeSmall::spawn)
+            .add_systems(Update, Wall::spawn)
+            .add_systems(Update, DeriveZFromY::spawn);
     }
 }
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Camera
-    commands.spawn({
-        Camera2dBundle {
-            projection: OrthographicProjection {
-                scale: 0.3,
-                ..default()
-            },
-            ..default()
-        }
+    commands.spawn(Camera2dBundle {
+        transform: Transform::from_scale(Vec3 {
+            x: 0.35,
+            y: 0.35,
+            z: 1.,
+        }),
+        ..default()
     });
 
     // Ldtk world

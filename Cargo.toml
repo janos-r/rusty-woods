@@ -1,28 +1,19 @@
 [package]
 edition = "2021"
 name = "rusty-woods"
-version = "0.1.0"
+version = "0.11.0"
 
 [dependencies]
 # This makes builds for development much faster!
 # NOTE from official docs:
 # Remember to revert this before releasing your game! Otherwise you will need to include libbevy_dylib alongside your game if you want it to run. If you remove the "dynamic" feature, your game executable can run standalone.
-bevy = { version = "0.10", features = ["dynamic_linking"] }
-# bevy = "0.10"
-bevy_ecs_ldtk = "0.7"
-bevy_rapier2d = "0.21"
+bevy = { version = "0.11", features = ["dynamic_linking"] }
+# bevy = "0.11"
+bevy_ecs_ldtk = "0.8"
+bevy_rapier2d = "0.22"
 
 # bevy_ecs_ldtk is using bevy_ecs_tilemap
 # bevy_ecs_tilemap has to be run with a feature flag when building to wasm, as they explain here <https://github.com/StarArawn/bevy_ecs_tilemap#running-examples-on-web>
 # As expained in the cargo book <https://doc.rust-lang.org/cargo/reference/features.html#feature-unification>, when you define here THE SAME VERSION of the dependency with the required feature, it is automatically accessible also to your other dependencies and solves the issue that bevy_ecs_ldtk doesn't provide a way to activate this through their features.
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-bevy_ecs_tilemap = { version = "0.10", features = ["atlas"] }
-
-# Directly from docs:
-# Enable a small amount of optimization in debug mode
-[profile.dev]
-opt-level = 1
-
-# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
-[profile.dev.package."*"]
-opt-level = 3
+bevy_ecs_tilemap = { version = "0.11", features = ["atlas"] }

@@ -10,29 +10,16 @@ pub fn spawn_children_text(
     font_handle: Handle<Font>,
     text: String,
 ) -> impl FnOnce(&mut ChildBuilder) {
-    // Known issue: text wrapping solution (bug workaround) based on: https://github.com/bevyengine/bevy/issues/1490
     const FONT_SIZE: f32 = 30.;
     move |parent: &mut ChildBuilder| {
-        // "Text Example",
-        for word in text.split_whitespace() {
-            parent.spawn(
-                TextBundle::from_section(
-                    word.to_string(),
-                    TextStyle {
-                        font: font_handle.clone(),
-                        font_size: FONT_SIZE,
-                        color: Color::WHITE,
-                    },
-                )
-                .with_style(Style {
-                    // this is required because of the bevy bug https://github.com/bevyengine/bevy/issues/5834
-                    max_size: Size::new(Val::Undefined, Val::Px(FONT_SIZE)),
-                    // this is the size of the spaces between words
-                    margin: UiRect::all(Val::Px(4.)),
-                    ..default()
-                }),
-            );
-        }
+        parent.spawn(TextBundle::from_section(
+            text,
+            TextStyle {
+                font: font_handle.clone(),
+                font_size: FONT_SIZE,
+                color: Color::WHITE,
+            },
+        ));
     }
 }
 
@@ -40,7 +27,8 @@ pub fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Bottom text box
     commands.spawn(NodeBundle {
         style: Style {
-            size: Size::new(Val::Percent(100.0), Val::Px(200.0)),
+            width: Val::Percent(100.),
+            height: Val::Px(200.),
             // align container to the bottom
             align_self: AlignSelf::FlexEnd,
             // makes space bellow the box
@@ -59,7 +47,8 @@ pub fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
         // box size, border thickness and color
         parent.spawn(NodeBundle {
             style: Style {
-                size: Size::new(Val::Percent(80.), Val::Percent(80.0)),
+                width: Val::Percent(80.),
+            height: Val::Percent(80.),
                 border: UiRect::all(Val::Px(6.0)),
                 ..default()
             },
@@ -71,11 +60,8 @@ pub fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
             let font_handle = asset_server.load("fonts/FiraSans-Bold.ttf");
             parent.spawn(NodeBundle {
                 style: Style {
-                    size: Size::new(Val::Percent(100.0), Val::Percent(100.)),
-                    padding: UiRect::all(Val::Px(6.)),
-                    // don't stretch vertically
-                    align_content: AlignContent::FlexStart,
-                    flex_wrap: FlexWrap::Wrap,
+                    padding: UiRect::all(Val::Px(10.)),
+                    width: Val::Percent(100.),
                     ..default()
                 },
                 background_color: Color::DARK_GRAY.into(),
@@ -84,7 +70,7 @@ pub fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
             .insert(TextBox)
             .insert(font_handle.clone())
             .with_children(spawn_children_text(font_handle, String::from(
-                "Text Example a little longer trying to cross the width. Text Example a little longer trying to cross the width"
+                "Text Example a little longer trying to cross the width... Text Example a little longer trying to cross the width"
             )));
         });
     });

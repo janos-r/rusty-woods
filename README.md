@@ -73,14 +73,6 @@ bevy game list\
 To look for real fixes in the future, if someone is looking to build upon this
 code.
 
-- UI wrapping text
-
-  - Bevy issue
-  - see in `ui.rs` under "Known issue"
-  - <https://github.com/bevyengine/bevy/issues/1490>
-  - Version [0.11](https://bevyengine.org/news/bevy-0-11/) claims to have solved
-    this
-
 - Accessing entity_refs outside the current level
 
   - bevy_ecs_ldtk issue
@@ -94,6 +86,7 @@ code.
     their own sheet - see `toriiGate.png` from `TilesetHouse.png` or
     `treeBig.png` from `objects.png`
   - <https://github.com/Trouv/bevy_ecs_ldtk/issues/151>
+  - TODO: check if still applies
 
 - Rules based tiles don't use pivot
   - bevy_ecs_ldtk issue
