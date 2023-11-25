@@ -86,9 +86,16 @@ code.
     their own sheet - see `toriiGate.png` from `TilesetHouse.png` or
     `treeBig.png` from `objects.png`
   - <https://github.com/Trouv/bevy_ecs_ldtk/issues/151>
-  - TODO: check if still applies
+  - still doesn't work in 0.8
 
 - Rules based tiles don't use pivot
   - bevy_ecs_ldtk issue
   - workaround: some ground objects had to be remade as entities
   - <https://github.com/Trouv/bevy_ecs_ldtk/issues/152>
+
+## Ongoing bug after upgrade to 0.11
+
+- After loading a level (entering the hous or going back), the tiles are not
+  rendered anymore. Entities are.
+  - bevy_ecs_ldtk issue, possibly bevy_ecs_tilemap issue
+    https://github.com/StarArawn/bevy_ecs_tilemap/pull/451
