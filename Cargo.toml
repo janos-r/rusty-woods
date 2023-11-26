@@ -15,5 +15,7 @@ bevy_rapier2d = "0.22"
 # bevy_ecs_ldtk is using bevy_ecs_tilemap
 # bevy_ecs_tilemap has to be run with a feature flag when building to wasm, as they explain here <https://github.com/StarArawn/bevy_ecs_tilemap#running-examples-on-web>
 # As expained in the cargo book <https://doc.rust-lang.org/cargo/reference/features.html#feature-unification>, when you define here THE SAME VERSION of the dependency with the required feature, it is automatically accessible also to your other dependencies and solves the issue that bevy_ecs_ldtk doesn't provide a way to activate this through their features.
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-bevy_ecs_tilemap = { version = "0.11", features = ["atlas"] }
+
+# [target.'cfg(target_arch = "wasm32")'.dependencies]
+# specific 0.11.1 to fix a bug in 0.11.0 (and for some reason it didn't update automatically with a 0.11)
+bevy_ecs_tilemap = { version = "0.11.1", features = ["atlas"] }
